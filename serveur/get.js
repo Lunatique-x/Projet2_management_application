@@ -1,6 +1,7 @@
 const express = require('express');
-const app = express();
 const port = 3000;
+
+const app = express.Router();
 
 // On définit la route GET
 // recuperer tout Facture
@@ -78,3 +79,5 @@ app.get('/AllEmploye', async (req, res) => {
 app.listen(port, () => {
   console.log(`Serveur lancé sur http://localhost:${port}`);
 });
+
+module.exports = app;
