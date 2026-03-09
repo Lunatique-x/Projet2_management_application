@@ -2,18 +2,25 @@ const express = require('express')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const path = require('path')
+const app = express();
+const port = 3000
 
-const { db } = require('./db')
-const app = express()
+const db = require('./db')
+
+app.use(express.json())
 
 app.post("/auth/register", async (req, res) => {
     const { email, password } = req.body;
+
+    if (!req.body) {
+    return res.status(400).json({ message: "Le corps de la requête est vide" });
+    }
 
     if (!email || !password) {
         return res.status(400).json({ message: "L'Email et le mdp sont requit" })
     }
     try {
-        const user = await db.get("SELECT * FROM users WHERE email = ?", [email])
+        const user = await db('employe').where('email', email).select('*').first();
 
         if (user) {
             return res.status(400).json({ message: "Utilisateur déjà existant" });
@@ -23,14 +30,12 @@ app.post("/auth/register", async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Insérer en base
-        await db.run(
-            "INSERT INTO users (email, password) VALUES (?, ?)",
-            [email, hashedPassword]
-        );
+        await db('employe').insert({ email, password: hashedPassword });
 
         // Réponse
         res.status(201).json({ message: "Compte créé avec succès" });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: "Erreur serveur" });
     }
 })
@@ -43,7 +48,7 @@ app.post("/auth/token", async (req, res) => {
         return res.status(400).json({ message: "L'Email et le mdp sont requit" })
     }
     try {
-        const user = await db.get("SELECT * FROM users WHERE email = ?", [email])
+        const user = await db('employe').where('email', email).select('*').first();
         if (!user) {
             return res.status(401).json({ message: "Utilisateur introuvable" });
         }
@@ -61,11 +66,14 @@ app.post("/auth/token", async (req, res) => {
         );
 
         // Retourner le token
-        res.json({ token });
+        res.json({token: token });
 
     } catch (error) {
         res.status(500).json({ message: "Erreur serveur" });
     }
 })
 
-export default app
+app.listen(port, () => {
+  console.log(`Serveur lancé sur http://localhost:${port}`);
+});
+//module.exports = app;
