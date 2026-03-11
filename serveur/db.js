@@ -32,6 +32,7 @@ async function createTables() {
       table.string("email").notNullable();
       table.string("phone").notNullable();
       table.timestamp("date_embauche");
+      table.string("password").notNullable();
       table.float("commission");
       table.integer("role_id")
            .references("id_role")
