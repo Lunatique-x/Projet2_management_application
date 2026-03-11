@@ -28,14 +28,15 @@ async function createTables() {
   if (!existsEmploye) {
     await db.schema.createTable("employe", (table) => {
       table.increments("id_employe").primary();
-      table.string("full_name").notNullable();
+      table.string("full_name");
       table.string("email").notNullable();
-      table.string("phone").notNullable();
-      table.timestamp("date_embauche");
+      table.string("phone");
+      table.date("date_embauche").defaultTo(db.fn.now());
       table.string("password").notNullable();
       table.float("commission");
       table.integer("role_id")
            .references("id_role")
+
            .inTable("role")
            .onDelete("SET NULL");
     });

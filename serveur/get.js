@@ -2,6 +2,7 @@ const express = require('express');
 const port = 3000;
 const db = require('./db');
 const app = express.Router();
+const authentifier = require('./commun.js')
 
 // On définit la route GET
 // recuperer tout Facture

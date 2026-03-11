@@ -6,7 +6,6 @@ curl -X GET http://localhost:3000/allVoiture
 
 curl -X GET http://localhost:3000/allRole
 
-
 curl -X GET http://localhost:3000/allEmploye
 
 curl -X GET http://localhost:3000/client/1/factures

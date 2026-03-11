@@ -1,9 +1,11 @@
 const express = require('express');
 const app = express.Router();
+const db = require('./db');
 const port = 3000;
+const authentifier = require('./commun.js')
 
 //supprimer un Payment
-app.delete('/Payment/:id', async (req, res) => {
+app.delete('/payment/:id', async (req, res) => {
     const { id } = req.params;
     const sql = "DELETE FROM Payment WHERE id_payment = ?";
     
@@ -13,7 +15,7 @@ app.delete('/Payment/:id', async (req, res) => {
     });
 });
 // supprimer un Client
-app.delete('/Client/:id', async (req, res) => {
+app.delete('/client/:id', async (req, res) => {
     const { id } = req.params;
     const sql = "DELETE FROM Client WHERE id_client = ?";
     
@@ -23,7 +25,7 @@ app.delete('/Client/:id', async (req, res) => {
     });
 });
 // supprimer une Voiture
-app.delete('/Voiture/:id', async (req, res) => {
+app.delete('/voiture/:id', async (req, res) => {
     const { id } = req.params;
     const sql = "DELETE FROM Voiture WHERE id_voiture = ?";
     
@@ -33,7 +35,7 @@ app.delete('/Voiture/:id', async (req, res) => {
     });
 });
 // supprimer un Role
-app.delete('/Role/:id', async (req, res) => {
+app.delete('/role/:id', async (req, res) => {
     const { id } = req.params;
     const sql = "DELETE FROM Role WHERE id_role = ?";
     
@@ -43,7 +45,7 @@ app.delete('/Role/:id', async (req, res) => {
     });
 });
 //supprimer un Employe
-app.delete('/Employe/:id', async (req, res) => {
+app.delete('/employe/:id', async (req, res) => {
     const { id } = req.params;
     const sql = "DELETE FROM Employe WHERE id_employe = ?";
     

@@ -1,10 +1,12 @@
 const express = require('express');
 const app = express.Router();
+const db = require('./db');
 const port = 3000;
+const authentifier = require('./commun.js')
 
 //route post
 //un nouveau Client
-app.post('/Client', async (req, res) => {
+app.post('/client', async (req, res) => {
     const { full_name, email, phone } = req.body;
     const sql = "INSERT INTO Client (full_name, email, phone, date_creation) VALUES (?, ?, ?, NOW())";
     
@@ -14,7 +16,7 @@ app.post('/Client', async (req, res) => {
     });
 });
 //une nouvelle Voiture
-app.post('/Voiture', async (req, res) => {
+app.post('/voiture', async (req, res) => {
     const { modele, stock, couleur, prix } = req.body;
     const sql = "INSERT INTO Voiture (modele, stock, couleur, prix) VALUES (?, ?, ?, ?)";
     
@@ -24,7 +26,7 @@ app.post('/Voiture', async (req, res) => {
     });
 });
 //un nouveau Role
-app.post('/Role', async (req, res) => {
+app.post('/role', async (req, res) => {
     const { nom, commentaire } = req.body;
     const sql = "INSERT INTO Role (nom, commentaire) VALUES (?, ?)";
     
@@ -34,7 +36,7 @@ app.post('/Role', async (req, res) => {
     });
 });
 //un nouvel Employe
-app.post('/Employe', async (req, res) => {
+app.post('/employe', async (req, res) => {
     const { full_name, email, phone, id_role } = req.body;
     const sql = "INSERT INTO Employe (full_name, email, phone, id_role, date_creation) VALUES (?, ?, ?, ?, NOW())";
     
@@ -44,7 +46,7 @@ app.post('/Employe', async (req, res) => {
     });
 });
 //un nouveau Payment (vente)
-app.post('/Payment', async (req, res) => {
+app.post('/payment', async (req, res) => {
     const { id_client, id_voiture, employe, date_fin_garantie, prix_vente } = req.body;
     const sql = "INSERT INTO Payment (id_client, id_voiture, employe, date_fin_garantie, prix_vente, date_creation) VALUES (?, ?, ?, ?, ?, NOW())";
     

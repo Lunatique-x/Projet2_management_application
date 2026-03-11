@@ -7,9 +7,9 @@ const port = 3000
 
 const db = require('./db')
 
-app.use(express.json())
+// app.use(express.json())
 
-app.post("/auth/register", async (req, res) => {
+app.post("/register", async (req, res) => {
     const { email, password } = req.body;
 
     if (!req.body) {
@@ -41,7 +41,7 @@ app.post("/auth/register", async (req, res) => {
 })
 
 
-app.post("/auth/token", async (req, res) => {
+app.post("/token", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -73,7 +73,8 @@ app.post("/auth/token", async (req, res) => {
     }
 })
 
-app.listen(port, () => {
-  console.log(`Serveur lancé sur http://localhost:${port}`);
-});
-//module.exports = app;
+// app.listen(port, () => {
+//   console.log(`Serveur lancé sur http://localhost:${port}`);
+// });
+
+module.exports = app;
