@@ -8,52 +8,74 @@ const authentifier = require('./commun.js')
 //un nouveau Client
 app.post('/client', async (req, res) => {
     const { full_name, email, phone } = req.body;
-    const sql = "INSERT INTO Client (full_name, email, phone, date_creation) VALUES (?, ?, ?, NOW())";
-    
-    db.query(sql, [full_name, email, phone], (err, result) => {
-        if (err) return res.status(500).json(err);
-        res.json({ message: 'Client créé avec succès', id: result.insertId });
-    });
+
+    try {
+        const [id] = await db('client').insert({ full_name, email, phone });
+        res.json({ message: 'Client créé avec succès', id });
+    } catch (err) {
+        res.status(500).json(err);
+    }
 });
 //une nouvelle Voiture
 app.post('/voiture', async (req, res) => {
     const { modele, stock, couleur, prix } = req.body;
-    const sql = "INSERT INTO Voiture (modele, stock, couleur, prix) VALUES (?, ?, ?, ?)";
-    
-    db.query(sql, [modele, stock, couleur, prix], (err, result) => {
-        if (err) return res.status(500).json(err);
-        res.json({ message: 'Voiture créée avec succès', id: result.insertId });
-    });
+
+    try {
+        const [id] = await db('voiture').insert({ modele, stock, couleur, prix });
+        res.json({ message: 'Voiture créée avec succès', id });
+    } catch (err) {
+        res.status(500).json(err);
+    }
 });
 //un nouveau Role
 app.post('/role', async (req, res) => {
     const { nom, commentaire } = req.body;
-    const sql = "INSERT INTO Role (nom, commentaire) VALUES (?, ?)";
-    
-    db.query(sql, [nom, commentaire], (err, result) => {
-        if (err) return res.status(500).json(err);
-        res.json({ message: 'Role créé avec succès', id: result.insertId });
-    });
+
+    try {
+        const [id] = await db('role').insert({ nom, commentaire });
+        res.json({ message: 'Role créé avec succès', id });
+    } catch (err) {
+        res.status(500).json(err);
+    }
 });
 //un nouvel Employe
 app.post('/employe', async (req, res) => {
-    const { full_name, email, phone, id_role } = req.body;
-    const sql = "INSERT INTO Employe (full_name, email, phone, id_role, date_creation) VALUES (?, ?, ?, ?, NOW())";
-    
-    db.query(sql, [full_name, email, phone, id_role], (err, result) => {
-        if (err) return res.status(500).json(err);
-        res.json({ message: 'Employe créé avec succès', id: result.insertId });
-    });
+    const { full_name, email, phone, id_role, role_id, password, commission } = req.body;
+
+    if (!password) {
+        return res.status(400).json({ message: 'password est requis' });
+    }
+
+    try {
+        const [id] = await db('employe').insert({
+            full_name,
+            email,
+            phone,
+            role_id: role_id ?? id_role,
+            password,
+            commission
+        });
+        res.json({ message: 'Employe créé avec succès', id });
+    } catch (err) {
+        res.status(500).json(err);
+    }
 });
 //un nouveau Payment (vente)
 app.post('/payment', async (req, res) => {
-    const { id_client, id_voiture, employe, date_fin_garantie, prix_vente } = req.body;
-    const sql = "INSERT INTO Payment (id_client, id_voiture, employe, date_fin_garantie, prix_vente, date_creation) VALUES (?, ?, ?, ?, ?, NOW())";
-    
-    db.query(sql, [id_client, id_voiture, employe, date_fin_garantie, prix_vente], (err, result) => {
-        if (err) return res.status(500).json(err);
-        res.json({ message: 'Payment créé avec succès', id: result.insertId });
-    });
+    const { id_client, id_voiture, employe, employe_id, date_fin_garantie, prix_vente } = req.body;
+
+    try {
+        const [id] = await db('payement').insert({
+            client_id: id_client,
+            voiture_id: id_voiture,
+            employe_id: employe_id ?? employe,
+            date_fin_garantie,
+            prix_vente
+        });
+        res.json({ message: 'Payment créé avec succès', id });
+    } catch (err) {
+        res.status(500).json(err);
+    }
 });
 
 module.exports = app;

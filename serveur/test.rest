@@ -9,3 +9,16 @@ curl -X GET http://localhost:3000/allRole
 curl -X GET http://localhost:3000/allEmploye
 
 curl -X GET http://localhost:3000/client/1/factures
+
+###
+POST http://localhost:3000/posts/client
+Content-Type: application/json
+
+{
+  "full_name": "tt",
+  "email": "tt@example.com",
+  "phone": "123-1234"
+}
+
+###
+DELETE http://localhost:3000/delete/client/1
