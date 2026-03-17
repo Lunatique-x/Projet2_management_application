@@ -10,6 +10,29 @@ curl -X GET http://localhost:3000/allEmploye
 
 curl -X GET http://localhost:3000/client/1/factures
 
+
+// get specifique
+
+curl -X GET http://localhost:3000/allFactures/1
+curl -X GET http://localhost:3000/allFactures/2
+
+curl -X GET http://localhost:3000/allClient/1
+curl -X GET http://localhost:3000/allClient/2
+
+curl -X GET http://localhost:3000/allVoiture/1
+curl -X GET http://localhost:3000/allVoiture/2
+
+curl -X GET http://localhost:3000/allRole/1
+curl -X GET http://localhost:3000/allRole/2
+
+curl -X GET http://localhost:3000/allEmploye/1
+curl -X GET http://localhost:3000/allEmploye/2
+
+
+
+
+
+
 ###
 POST http://localhost:3000/posts/client
 Content-Type: application/json
@@ -22,3 +45,4 @@ Content-Type: application/json
 
 ###
 DELETE http://localhost:3000/delete/client/1
+DELETE http://localhost:3000/delete/client/2
