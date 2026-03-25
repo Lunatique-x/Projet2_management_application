@@ -31,7 +31,7 @@ async function createTables() {
       table.string("full_name");
       table.string("email").notNullable();
       table.string("phone");
-      table.date("date_embauche").defaultTo(db.fn.now());
+      table.date("date_embauche").defaultTo(db.raw('CURRENT_DATE'));
       table.string("password").notNullable();
       table.float("commission");
       table.integer("role_id")
