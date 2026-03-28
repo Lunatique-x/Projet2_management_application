@@ -3,9 +3,11 @@ const port = 3000;
 const db = require('./db');
 const app = express.Router();
 const jwt = require('jsonwebtoken');
+const authentifier = require('./commun')
 
 // On définit la route GET
-// recuperer tout Facture
+
+// Cette route permet de recuperer tout les factures
 app.get('/allFactures',authentifier, async (req, res) => {
     console.log("Facture");
     // 2. La requête à la base de données
@@ -16,7 +18,7 @@ app.get('/allFactures',authentifier, async (req, res) => {
         res.status(500).json(err);
     }
 });
-//recupertaion d'un facture specifique
+//Cette route permet de recuper une facture specifique selon id de la facture
 app.get('/allFactures/:id',authentifier, async (req, res) => {
     const FactureId = req.params.id;
     try {
@@ -31,7 +33,7 @@ app.get('/allFactures/:id',authentifier, async (req, res) => {
                 'voiture.modele as voiture_modele',
                 'employe.full_name as vendeur_nom'
             )
-            .first(); // Récupère l'objet directement, pas un tableau
+            .first();
 
         if (!facture) {
             return res.status(404).json({ message: "Facture introuvable." });
@@ -45,7 +47,7 @@ app.get('/allFactures/:id',authentifier, async (req, res) => {
 });
 
 
-// recuperer tout Client
+// cette route permet recuperer tout les Client
 app.get('/allClient',authentifier, async (req, res) => {
     console.log("Client");
     try {
@@ -55,7 +57,7 @@ app.get('/allClient',authentifier, async (req, res) => {
         res.status(500).json(err);
     }
 });
-
+//cette route permet recuperer un client specifique selon id du client
 app.get('/allClient/:id',authentifier, async (req, res) => {
     const ClientId  = req.params.id;
     try {
@@ -67,8 +69,7 @@ app.get('/allClient/:id',authentifier, async (req, res) => {
                  'email', 'phone',
                   'date_creation'
                 )
-            .first(); // Récupère l'objet directement, pas un tableau
-
+            .first(); 
         if (!client) {
             return res.status(404).json({ message: "Client non trouvé." });
         }
@@ -81,7 +82,7 @@ app.get('/allClient/:id',authentifier, async (req, res) => {
 });
 
 
-// recuperer tout Voiture
+// Cette route permet de recuperer tout les voitures
 app.get('/allVoiture',authentifier, async (req, res) => {
     console.log("voiture");
     try {
@@ -91,7 +92,7 @@ app.get('/allVoiture',authentifier, async (req, res) => {
         res.status(500).json(err);
     }
 });
-
+// Cette route permet de recuperer une voiture specifique selon id de la voiture
 app.get('/allVoiture/:id',authentifier, async (req, res) => {
     const voitureID = req.params.id;
     try {
@@ -104,8 +105,7 @@ app.get('/allVoiture/:id',authentifier, async (req, res) => {
                   'couleur',
                   'prix'
                 )
-            .first(); // Récupère l'objet directement, pas un tableau
-
+            .first(); 
         if (!voiture) {
             return res.status(404).json({ message: "Voiture non trouvé." });
         }
@@ -118,7 +118,7 @@ app.get('/allVoiture/:id',authentifier, async (req, res) => {
 });
 
 
-// recuperer tout Role
+//Cette route permet de recuperer tout les Role
 app.get('/allRole',authentifier, async (req, res) => {
     console.log("role");
     try {
@@ -128,7 +128,7 @@ app.get('/allRole',authentifier, async (req, res) => {
         res.status(500).json(err);
     }
 });
-
+//Cette route permet de recuperer un role specifique selon id du role
 app.get('/allRole/:id',authentifier, async (req, res) => {
     const RoleId = req.params.id;
     try {
@@ -140,7 +140,7 @@ app.get('/allRole/:id',authentifier, async (req, res) => {
                  'commentaire'
 
                 )
-            .first(); // Récupère l'objet directement, pas un tableau
+            .first(); 
 
         if (!role) {
             return res.status(404).json({ message: "role non trouvé." });
@@ -153,7 +153,7 @@ app.get('/allRole/:id',authentifier, async (req, res) => {
     }
 });
 
-// recuperer tout Employer
+// cette route permet de recuperer tout les employes
 app.get('/allEmploye',authentifier, async (req, res) => {
     console.log("employe");
     try {
@@ -163,7 +163,7 @@ app.get('/allEmploye',authentifier, async (req, res) => {
         res.status(500).json(err);
     }
 });
-
+// cette route permet de recuperer un employe sepcifique selon id de employe
 app.get('/allEmployee/:id',authentifier, async (req, res) => {
     const EmployeId = req.params.id;
     try {
@@ -194,13 +194,12 @@ app.get('/allEmployee/:id',authentifier, async (req, res) => {
 });
 
 
-// Récupérer les factures d'un client spécifique via son ID
+// Cette route permet de recuper les factures d'un client selon id du client
 app.get('/client/:id/factures',authentifier, async (req, res) => {
     const clientId = req.params.id;
     console.log(`Récupération des factures pour le client ID: ${clientId}`);
 
     try {
-        // On joint la table 'payement' avec la table 'client'
         const result = await db('payement')
             .where('client_id', clientId)
             .select(
@@ -221,24 +220,6 @@ app.get('/client/:id/factures',authentifier, async (req, res) => {
     }
 });
 
-//verication des tokens
-const authentifier = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-        return res.status(401).json({ message: "Accès interdit : pas de badge !" });
-    }
-
-    try {
-        // Tu utilises la clé que ton pote a définie dans son fichier
-        const payload = jwt.verify(token, "SECRET_KEY");
-        req.user = payload; // On stocke les infos de l'utilisateur (id, email)
-        next(); // Badge valide ! On laisse passer vers la base de données
-    } catch (err) {
-        return res.status(403).json({ message: "Badge expiré ou truqué !" });
-    }
-};
 
 
 /*app.listen(port, () => {
