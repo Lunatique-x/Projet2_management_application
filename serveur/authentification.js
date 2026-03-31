@@ -9,13 +9,15 @@ const db = require('./db')
 
 // app.use(express.json())
 
+// Route qui permet de crée un utilisateur 
 app.post("/register", async (req, res) => {
-    const { email, password } = req.body;
+    const { full_name, email, password, phone, commission } = req.body;
 
     if (!req.body) {
     return res.status(400).json({ message: "Le corps de la requête est vide" });
     }
 
+    // L'email et le password son obligatoire dans la création du compte
     if (!email || !password) {
         return res.status(400).json({ message: "L'Email et le mdp sont requit" })
     }
@@ -30,7 +32,7 @@ app.post("/register", async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Insérer en base
-        await db('employe').insert({ email, password: hashedPassword });
+        await db('employe').insert({ full_name, email, password: hashedPassword, phone, commission });
 
         // Réponse
         res.status(201).json({ message: "Compte créé avec succès" });
@@ -40,7 +42,7 @@ app.post("/register", async (req, res) => {
     }
 })
 
-
+// Route qui permet de créé un token
 app.post("/token", async (req, res) => {
     const { email, password } = req.body;
 
