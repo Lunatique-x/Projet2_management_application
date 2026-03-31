@@ -15,13 +15,21 @@ async function createTables() {
 
   // ---- role ----
   const existsRole = await db.schema.hasTable("role");
-  if (!existsRole) {
-    await db.schema.createTable("role", (table) => {
-      table.increments("id_role").primary();
-      table.string("nom").notNullable();
-      table.string("commentaire");
-    });
-  }
+
+if (!existsRole) {
+  await db.schema.createTable("role", (table) => {
+    table.increments("id_role").primary();
+
+    table.string("nom").notNullable();
+    table.string("commentaire");
+
+    table.integer("permission_id")
+      .unsigned()
+      .references("id_permission")
+      .inTable("permissions")
+      .onDelete("SET NULL");
+  });
+}
 
   // ---- employe ----
   const existsEmploye = await db.schema.hasTable("employe");
@@ -90,7 +98,21 @@ async function createTables() {
            .inTable("employe")
            .onDelete("SET NULL");
     });
-  }
+}
+// ---- permissions ----
+  const existsPermissions = await db.schema.hasTable("permissions");
+  if (!existsPermissions) {
+  await db.schema.createTable("permissions", (table) => {
+    table.increments("id_permission").primary();
+
+    table.boolean("seeStock").notNullable().defaultTo(false);
+    table.boolean("modStock").notNullable().defaultTo(false);
+    table.boolean("seeClients").notNullable().defaultTo(false);
+    table.boolean("modClients").notNullable().defaultTo(false);
+    table.boolean("modSell").notNullable().defaultTo(false);
+    table.boolean("addClient").notNullable().defaultTo(false);
+  });
+}
 }
 
 // call function
