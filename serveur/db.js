@@ -21,13 +21,13 @@ if (!existsRole) {
     table.increments("id_role").primary();
 
     table.string("nom").notNullable();
-    table.string("commentaire");
-
-    table.integer("permission_id")
-      .unsigned()
-      .references("id_permission")
-      .inTable("permissions")
-      .onDelete("SET NULL");
+    table.boolean("seeStock").notNullable().defaultTo(false);
+    table.boolean("modStock").notNullable().defaultTo(false);
+    table.boolean("seeClients").notNullable().defaultTo(false);
+    table.boolean("modClients").notNullable().defaultTo(false);
+    table.boolean("modSell").notNullable().defaultTo(false);
+    table.boolean("addClient").notNullable().defaultTo(false);
+    
   });
 }
 
@@ -99,20 +99,7 @@ if (!existsRole) {
            .onDelete("SET NULL");
     });
 }
-// ---- permissions ----
-  const existsPermissions = await db.schema.hasTable("permissions");
-  if (!existsPermissions) {
-  await db.schema.createTable("permissions", (table) => {
-    table.increments("id_permission").primary();
 
-    table.boolean("seeStock").notNullable().defaultTo(false);
-    table.boolean("modStock").notNullable().defaultTo(false);
-    table.boolean("seeClients").notNullable().defaultTo(false);
-    table.boolean("modClients").notNullable().defaultTo(false);
-    table.boolean("modSell").notNullable().defaultTo(false);
-    table.boolean("addClient").notNullable().defaultTo(false);
-  });
-}
 }
 
 // call function
