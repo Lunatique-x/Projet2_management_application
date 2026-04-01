@@ -1,10 +1,7 @@
 const express = require('express');
-const knex = require('knex');
 
 const app = express();
 app.use(express.json());
-
-db.raw('PRAGMA foreign_keys = ON');
 
 const updateById = (table, idField) => async (req, res) => {
   try {
@@ -34,10 +31,8 @@ app.put('/clients/:id', updateById('client', 'id_client'));
 app.put('/voitures/:id', updateById('voiture', 'id_voiture'));
 app.put('/payements/:id', updateById('payement', 'id_payement'));
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+;
 
 
 module.exports = app;
