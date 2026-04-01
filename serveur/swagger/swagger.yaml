@@ -1,0 +1,242 @@
+openapi: 3.0.0
+info:
+  title: API de Gestion
+  description: Documentation des routes pour les rôles, voitures, clients, employés et factures.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Serveur Local Express
+
+paths:
+  # --- RÔLES ---
+  /allRole:
+    get:
+      summary: Liste de tous les rôles
+      responses:
+        '200':
+          description: Succès
+  /allRole/{id}:
+    get:
+      summary: Un rôle selon son ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Succès
+
+  # --- VOITURES ---
+  /allVoiture:
+    get:
+      summary: Liste de toutes les voitures
+      responses:
+        '200':
+          description: Succès
+  /allVoiture/{id}:
+    get:
+      summary: Une voiture selon son ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Succès
+
+  # --- CLIENTS / EMPLOYÉS ---
+  /allClient:
+    get:
+      summary: Liste de tous les clients / employés
+      responses:
+        '200':
+          description: Succès
+  /allClient/{id}:
+    get:
+      summary: Détails d'un client ou employé par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Succès
+
+  # --- FACTURES ---
+  /allFactures:
+    get:
+      summary: Liste de toutes les factures
+      responses:
+        '200':
+          description: Succès
+  /allFactures/{id}:
+    get:
+      summary: Une facture selon son ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Succès
+  /client/{id}/factures:
+    get:
+      summary: Factures spécifiques à un client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Succès
+
+  # --- AUTHENTIFICATION (POST) ---
+  /auth/register:
+    post:
+      summary: Création compte employé
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name: { type: string }
+                email: { type: string }
+                password: { type: string }
+            example:
+              full_name: "Kerian"
+              email: "kerian@test.com"
+              password: "123456"
+      responses:
+        '201':
+          description: Créé
+  /auth/token:
+    post:
+      summary: Génération de token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                password: { type: string }
+            example:
+              email: "kerian@test.com"
+              password: "123456"
+      responses:
+        '200':
+          description: Succès
+
+  # --- POSTS ---
+  /posts/client:
+    post:
+      summary: Création d'un client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name: { type: string }
+                email: { type: string }
+                phone: { type: string }
+            example:
+              full_name: "Kerian"
+              email: "kerianclient@gmail.com"
+              phone: "514-123-4567"
+      responses:
+        '201':
+          description: Client créé
+    /posts/voiture:
+    post:
+      summary: Création d'une voiture
+      description: Ajoute une nouvelle voiture au stock.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                modele: { type: string }
+                stock: { type: integer }
+                couleur: { type: string }
+                prix: { type: number }
+            example:
+              modele: "Tesla Model 3"
+              stock: 12
+              couleur: "Bleu"
+              prix: 42990.50
+      responses:
+        '201':
+          description: Voiture créée
+
+  /posts/role:
+    post:
+      summary: Création d'un rôle
+      description: Définit un nouveau rôle avec des permissions spécifiques.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom: { type: string }
+                seeStock: { type: boolean }
+                modStock: { type: boolean }
+                seeClients: { type: boolean }
+                modClients: { type: boolean }
+                modSell: { type: boolean }
+                addClient: { type: boolean }
+            example:
+              nom: "Vendeur Junior"
+              seeStock: true
+              modStock: false
+              seeClients: true
+              modClients: false
+              modSell: true
+              addClient: true
+      responses:
+        '201':
+          description: Rôle créé
+
+  /posts/payement:
+    post:
+      summary: Création d'un paiement
+      description: Enregistre une transaction entre un client, un employé et une voiture.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_client: { type: integer }
+                id_voiture: { type: integer }
+                employe_id: { type: integer }
+                date_fin_garantie: { type: string, format: date }
+                prix_vente: { type: number }
+            example:
+              id_client: 40
+              id_voiture: 8
+              employe_id: 3
+              date_fin_garantie: "2026-03-31"
+              prix_vente: 24500.00
+      responses:
+        '201':
+          description: Paiement enregistré

@@ -42,7 +42,7 @@ app.post("/register", async (req, res) => {
     }
 })
 
-// Route qui permet de créé un token
+// Route qui permet de créé un token et de retourner un Token
 app.post("/token", async (req, res) => {
     const { email, password } = req.body;
 
