@@ -33,7 +33,7 @@ curl -X GET http://localhost:3000/allEmploye/2
 
 
 
-###
+###post
 POST http://localhost:3000/posts/client
 Content-Type: application/json
 
@@ -43,6 +43,5 @@ Content-Type: application/json
   "phone": "123-1234"
 }
 
-###
+###delete
 DELETE http://localhost:3000/delete/client/1
-DELETE http://localhost:3000/delete/client/2
