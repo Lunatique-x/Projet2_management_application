@@ -22,7 +22,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 // Si routeAuth contient .post('/register'), l'URL sera http://localhost:8000/auth/register
-app.use('/get', routesGet); 
+app.use('/', routesGet); 
 app.use('/auth', routeAuth); 
 app.use('/posts', routePost);
 app.use('/delete', routeDelete);

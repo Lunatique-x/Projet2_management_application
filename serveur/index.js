@@ -11,7 +11,7 @@ const routePut = require('./put.js') // Importation des Puts
 // Optionnel mais recommandé pour lire le JSON plus tard
 app.use(express.json());
 
-app.use('/get', routesGet);
+app.use('/', routesGet);
 app.use('/auth', routeAuth);
 app.use('/posts', routePost);
 app.use('/delete', routeDelete);
