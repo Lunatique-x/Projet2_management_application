@@ -4,14 +4,6 @@ const knex = require('knex');
 const app = express();
 app.use(express.json());
 
-const db = knex({
-  client: 'sqlite3',
-  connection: {
-    filename: './db.sqlite3'
-  },
-  useNullAsDefault: true
-});
-
 db.raw('PRAGMA foreign_keys = ON');
 
 const updateById = (table, idField) => async (req, res) => {
