@@ -1,0 +1,729 @@
+{
+  "info": {
+    "_postman_id": "b87ca2ec-a90a-4e74-80da-8e0b45738577",
+    "name": "ConcessionaireAPI",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52004984"
+  },
+  "item": [
+    {
+      "name": "Employer",
+      "item": [
+        {
+          "name": "Toutes les employe",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [],
+              "options": {
+                "urlencoded": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/allEmploye",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "allEmploye"
+              ]
+            },
+            "description": "Recuperation de tous les employées"
+          },
+          "response": []
+        },
+        {
+          "name": "Création compte employer",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"full_name\": \"Kerian\",\r\n    \"email\": \"kerian@test.com\",\r\n    \"password\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Permet de crée un utilisateur."
+          },
+          "response": []
+        },
+        {
+          "name": "Modification Employes",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"full_name\": \"Mario Luigi\",\r\n  \"email\": \"exemple@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/put/employes/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "put",
+                "employes",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recuperation employer selon id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"matricule\": \"1234567\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/allEmploye/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "allEmploye",
+                "1"
+              ]
+            },
+            "description": "recuperation d'un employe selon id d'un employe"
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer un employe",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/delete/employe/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "delete",
+                "employe",
+                "1"
+              ]
+            },
+            "description": "Supprimer un employe"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Client",
+      "item": [
+        {
+          "name": "Toutes les clients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/allClient",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "allClient"
+              ]
+            },
+            "description": "cette route permet recuperer tout les Client"
+          },
+          "response": []
+        },
+        {
+          "name": "Création Client",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"full_name\" : \"Alex\",\r\n    \"email\" : \"alexclient@gmail.com\",\r\n    \"phone\" : \"514-123-4567\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/post/client",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "post",
+                "client"
+              ]
+            },
+            "description": "Création d'un client"
+          },
+          "response": []
+        },
+        {
+          "name": "Modification Clients",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"full_name\": \"Lex Icon\",\r\n  \"email\": \"exemple@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/put/clients/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "put",
+                "clients",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Les client selon id du clients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/allClient/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "allClient",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer un client",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/delete/client/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "delete",
+                "client",
+                "1"
+              ]
+            },
+            "description": "Supprime un client"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Facture",
+      "item": [
+        {
+          "name": "Création Facture",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"client_id\": 1,\r\n  \"voiture_id\": 1,\r\n  \"employe_id\": 1,\r\n  \"date_fin_garantie\": \"2026-03-31\",\r\n  \"prix_vente\": 24500.00\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/post/payement",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "post",
+                "payement"
+              ]
+            },
+            "description": "Création d'un payement"
+          },
+          "response": []
+        },
+        {
+          "name": "Tout les facture",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/allFactures",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "allFactures"
+              ]
+            },
+            "description": "Recuperation des factures"
+          },
+          "response": []
+        },
+        {
+          "name": "Facture selon id du client",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/client/1/factures",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "client",
+                "1",
+                "factures"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Une facture selon id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/allFactures/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "allFactures",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modifications Facture",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"prix_vente\": 3000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/put/payements/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "put",
+                "payements",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer une facture",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/delete/payment/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "delete",
+                "payment",
+                "1"
+              ]
+            },
+            "description": "suprimer une facture"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Voiture",
+      "item": [
+        {
+          "name": "Création voiture",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"modele\": \"Tesla Model 3\",\r\n  \"stock\": 12,\r\n  \"couleur\": \"Bleu\",\r\n  \"prix\": 42990.50\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/post/voiture",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "post",
+                "voiture"
+              ]
+            },
+            "description": "Création d'une voiture"
+          },
+          "response": []
+        },
+        {
+          "name": "Tous les voiture",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/allVoiture",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "allVoiture"
+              ]
+            },
+            "description": "Cette route permet de recuperer tout les voitures"
+          },
+          "response": []
+        },
+        {
+          "name": "Une voiturse selon id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/allVoiture/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "allVoiture",
+                "1"
+              ]
+            },
+            "description": "Cette route permet de recuperer une voiture specifique selon id de la voiture"
+          },
+          "response": []
+        },
+        {
+          "name": "Modifications Voitures",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"modele\": \"Toyota\",\r\n  \"couleur\": \"vert\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/put/voitures/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "put",
+                "voitures",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer une voiture",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/delete/voiture/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "delete",
+                "voiture",
+                "1"
+              ]
+            },
+            "description": "Supprimer une facuture"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Role",
+      "item": [
+        {
+          "name": "Création rôle",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nom\": \"Vendeur Junior\",\r\n  \"seeStock\": true,\r\n  \"modStock\": false,\r\n  \"seeClients\": true,\r\n  \"modClients\": false,\r\n  \"modSell\": true,\r\n  \"addClient\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/post/role",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "post",
+                "role"
+              ]
+            },
+            "description": "Création d'un role"
+          },
+          "response": []
+        },
+        {
+          "name": "Tous les role",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/allRole",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "allRole"
+              ]
+            },
+            "description": "Cette route permet de recuperer un role specifique selon id du role"
+          },
+          "response": []
+        },
+        {
+          "name": "Un role selon id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/allRole/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "allRole",
+                "1"
+              ]
+            },
+            "description": "Cette route permet de recuperer un role specifique selon id du roleEndFragment"
+          },
+          "response": []
+        },
+        {
+          "name": "Modification Role",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nom\": \"Vendeur Junior\",\r\n  \"seeStock\": false,\r\n  \"modClients\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/put/roles/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "put",
+                "roles",
+                "1"
+              ]
+            },
+            "description": "Modifie un role"
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer un role",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/delete/role/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "delete",
+                "role",
+                "1"
+              ]
+            },
+            "description": "Suprime un role"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Token",
+      "item": [
+        {
+          "name": "Création Token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"kerian@test.com\",\r\n    \"password\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/auth/token",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "token"
+              ]
+            },
+            "description": "Permet de crée un token d'authentifications."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
