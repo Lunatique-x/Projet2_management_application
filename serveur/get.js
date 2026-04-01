@@ -135,9 +135,10 @@ app.get('/allRole/:id',/*authentifier,*/ async (req, res) => {
         const role = await db('role')
             .where('id_role', RoleId)
             .select(
-                'id_role',
-                 'nom', 
-                 'commentaire'
+                'id_role', 
+                'nom', 
+                'seeStock', 
+                'modStock'
 
                 )
             .first(); 
@@ -149,7 +150,7 @@ app.get('/allRole/:id',/*authentifier,*/ async (req, res) => {
         res.json(role);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Erreur lors de la récupération du voiture" });
+        res.status(500).json({ error: "Erreur lors de la récupération du role" });
     }
 });
 
