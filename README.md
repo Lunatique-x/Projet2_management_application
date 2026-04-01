@@ -1,1 +1,2 @@
-ashlé, quérian, danne yiel et sao chan. projet 2
+Pour démarrer l'application soyer dans le fichier serveur puis lancer la commande npm install
+Lancement du serveur avec node .\swagger\documentation.js
