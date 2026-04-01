@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 8000;
+const port = 3000;
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const authentifier = require('../commun.js');
@@ -20,7 +20,7 @@ const routeDelete = require('../delete.js');
 const routePut = require('../put.js');
 
 // 4. Routes
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use('/auth', routeAuth);
 app.use('/', authentifier, routesGet);
@@ -29,5 +29,5 @@ app.use('/delete',authentifier, routeDelete);
 app.use('/put',authentifier, routePut);
 
 app.listen(port, () => {
-  console.log(`Documentation disponible sur http://localhost:${port}/api-docs`);
+  console.log(`Documentation disponible sur http://localhost:${port}/api`);
 });

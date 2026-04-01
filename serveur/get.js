@@ -137,8 +137,12 @@ app.get('/allRole/:id', async (req, res) => {
             .select(
                 'id_role', 
                 'nom', 
-                'seeStock', 
-                'modStock'
+                'seeStock',
+                'seeClients', 
+                'modStock',
+                'modClients',
+                'modSell',
+                'addClient'
 
                 )
             .first(); 
@@ -166,12 +170,13 @@ app.get('/allEmploye', async (req, res) => {
 });
 // cette route permet de recuperer un employe sepcifique selon id de employe
 app.get('/allEmployee/:id', async (req, res) => {
-    const EmployeId = req.params.id;
+    const employeId = req.params.id;
     try {
         const employe = await db('employe')
-            .where('id_employe', EmployeId)
-            
             .join('role', 'employe.role_id', '=', 'role.id_role')
+            .where('employe.id_employe', employeId)
+            
+            
             .select(
                 'employe.id_employe',
                 'employe.full_name',
@@ -179,8 +184,7 @@ app.get('/allEmployee/:id', async (req, res) => {
                 'employe.phone',
                 'employe.date_embauche',
                 'employe.commission',
-                'role.nom as role_nom', 
-                'role.commentaire as role_desc'
+                'role.nom as role_nom'
             )
             .first();
         if (!employe) {
