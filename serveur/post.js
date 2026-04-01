@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcrypt')
 const app = express.Router();
 const db = require('./db');
 const port = 3000;
@@ -38,57 +39,66 @@ app.post('/role', async (req, res) => {
         res.status(500).json(err);
     }
 });
-//un nouvel Employe
-// NE PAS UTILISER !!
-app.post('/employe', async (req, res) => {
-    const { full_name, email, phone, id_role, role_id, password, commission } = req.body;
+// Route qui permet de crée un Employe
+app.post("/employe", async (req, res) => {
+    const { full_name, email, password, phone, commission, id_role } = req.body;
 
-    if (!password) {
-        return res.status(400).json({ message: 'password est requis' });
+    if (!req.body) {
+    return res.status(400).json({ message: "Le corps de la requête est vide" });
     }
 
+    // L'email et le password son obligatoire dans la création du compte
+    if (!email || !password) {
+        return res.status(400).json({ message: "L'Email et le mdp sont requit" })
+    }
     try {
-        const [id] = await db('employe').insert({
-            full_name,
-            email,
-            phone,
-            role_id: role_id ?? id_role,
-            password,
-            commission
-        });
-        res.json({ message: 'Employe créé avec succès', id });
-    } catch (err) {
-        res.status(500).json(err);
+        const user = await db('employe').where('email', email).select('*').first();
+
+        if (user) {
+            return res.status(400).json({ message: "Utilisateur déjà existant" });
+        }
+
+        // Hasher le mot de passe
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Insérer en base
+        await db('employe').insert({ full_name, email, password: hashedPassword, phone, commission, id_role });
+
+        // Réponse
+        res.status(201).json({ message: "Compte créé avec succès" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erreur serveur" });
     }
-});
+})
 //un nouveau Payment (vente)
 app.post('/payement', async (req, res) => {
-    const { id_client, id_voiture, id_employe, date_fin_garantie, prix_vente } = req.body;
+    const { client_id, voiture_id, employe_id, date_fin_garantie, prix_vente } = req.body;
 
     try {
         // 1. Vérifier le client (colonne id_client)
-        const clientExists = await db('client').where({ id_client: id_client }).first();
+        const clientExists = await db('client').where({ id_client: client_id }).first();
         if (!clientExists) {
             return res.status(404).json({ message: "Le client spécifié n'existe pas" });
         }
 
         // 2. Vérifier la voiture (colonne id_voiture)
-        const voitureExists = await db('voiture').where({ id_voiture: id_voiture }).first();
+        const voitureExists = await db('voiture').where({ id_voiture: voiture_id }).first();
         if (!voitureExists) {
             return res.status(404).json({ message: "La voiture spécifiée n'existe pas" });
         }
 
         // 3. Vérifier l'employé (colonne id_employe)
-        const employeExists = await db('employe').where({ id_employe: id_employe }).first();
+        const employeExists = await db('employe').where({ id_employe: employe_id }).first();
         if (!employeExists) {
             return res.status(404).json({ message: "L'employé spécifié n'existe pas" });
         }
 
         // 4. Insertion (Assure-toi que les noms de colonnes dans la table 'payement' sont corrects)
         const [id] = await db('payement').insert({
-            id_client,
-            id_voiture,
-            id_employe,
+            client_id,
+            voiture_id,
+            employe_id,
             date_fin_garantie,
             prix_vente
         });

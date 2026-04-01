@@ -1,108 +1,53 @@
 openapi: 3.0.0
 info:
-  title: API de Gestion
-  description: Documentation des routes pour les rôles, voitures, clients, employés et factures.
+  title: ConcessionaireAPI - Section Employés
   version: 1.0.0
 servers:
   - url: http://localhost:8000
-    description: Serveur Local Express
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: jsonwebtoken
+
+
+tags:
+  - name: Employer
+    description: Gestion des employés du concessionnaire
 
 paths:
-  # --- RÔLES ---
-  /allRole:
+  /allEmploye:
     get:
-      summary: Liste de tous les rôles
+      tags: [Employer]
+      summary: Récupérer tous les employés
+      description: Récupération de tous les employées
       responses:
         '200':
-          description: Succès
-  /allRole/{id}:
+          description: Liste des employés récupérée avec succès
+  
+  /allEmploye/{id}:
     get:
-      summary: Un rôle selon son ID
+      tags: [Employer]
+      summary: Récupérer un employé par ID
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+          example: "1"
       responses:
         '200':
-          description: Succès
+          description: Détails de l'employé
 
-  # --- VOITURES ---
-  /allVoiture:
-    get:
-      summary: Liste de toutes les voitures
-      responses:
-        '200':
-          description: Succès
-  /allVoiture/{id}:
-    get:
-      summary: Une voiture selon son ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Succès
-
-  # --- CLIENTS / EMPLOYÉS ---
-  /allClient:
-    get:
-      summary: Liste de tous les clients / employés
-      responses:
-        '200':
-          description: Succès
-  /allClient/{id}:
-    get:
-      summary: Détails d'un client ou employé par ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Succès
-
-  # --- FACTURES ---
-  /allFactures:
-    get:
-      summary: Liste de toutes les factures
-      responses:
-        '200':
-          description: Succès
-  /allFactures/{id}:
-    get:
-      summary: Une facture selon son ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Succès
-  /client/{id}/factures:
-    get:
-      summary: Factures spécifiques à un client
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Succès
-
-  # --- AUTHENTIFICATION (POST) ---
   /auth/register:
     post:
+      tags: [Employer]
       summary: Création compte employé
       requestBody:
         required: true
@@ -111,19 +56,29 @@ paths:
             schema:
               type: object
               properties:
-                full_name: { type: string }
-                email: { type: string }
-                password: { type: string }
-            example:
-              full_name: "Kerian"
-              email: "kerian@test.com"
-              password: "123456"
+                full_name:
+                  type: string
+                  example: "Kerian"
+                email:
+                  type: string
+                  example: "kerian@test.com"
+                password:
+                  type: string
+                  example: "123456"
       responses:
         '201':
-          description: Créé
-  /auth/token:
-    post:
-      summary: Génération de token
+          description: Employé créé avec succès
+
+  /put/employes/{id}:
+    put:
+      tags: [Employer]
+      summary: Modification d'un employé
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -131,64 +86,48 @@ paths:
             schema:
               type: object
               properties:
-                email: { type: string }
-                password: { type: string }
-            example:
-              email: "kerian@test.com"
-              password: "123456"
+                full_name:
+                  type: string
+                  example: "Mario Luigi"
+                email:
+                  type: string
+                  example: "exemple@gmail.com"
+      responses:
+        '200':
+          description: Employé mis à jour
+
+  /delete/employe/{id}:
+    delete:
+      tags: [Employer]
+      summary: Supprimer un employé
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Employé supprimé
+  # --- CLIENTS ---
+  /allClient:
+    get:
+      tags:
+        - Client
+      summary: Toutes les clients
+      description: Cette route permet de récupérer tous les clients.
       responses:
         '200':
           description: Succès
 
-  # --- POSTS ---
-  /posts/client:
+  /post/client:
     post:
-      summary: Création d'un client
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                full_name: { type: string }
-                email: { type: string }
-                phone: { type: string }
-            example:
-              full_name: "Kerian"
-              email: "kerianclient@gmail.com"
-              phone: "514-123-4567"
-      responses:
-        '201':
-          description: Client créé
-    /posts/voiture:
-    post:
-      summary: Création d'une voiture
-      description: Ajoute une nouvelle voiture au stock.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                modele: { type: string }
-                stock: { type: integer }
-                couleur: { type: string }
-                prix: { type: number }
-            example:
-              modele: "Tesla Model 3"
-              stock: 12
-              couleur: "Bleu"
-              prix: 42990.50
-      responses:
-        '201':
-          description: Voiture créée
+      tags:
+        - Client
+      description: Gestion des clients
 
-  /posts/role:
-    post:
-      summary: Création d'un rôle
-      description: Définit un nouveau rôle avec des permissions spécifiques.
+      summary: Création Client
+      description: Création d'un client
       requestBody:
         required: true
         content:
@@ -196,29 +135,31 @@ paths:
             schema:
               type: object
               properties:
-                nom: { type: string }
-                seeStock: { type: boolean }
-                modStock: { type: boolean }
-                seeClients: { type: boolean }
-                modClients: { type: boolean }
-                modSell: { type: boolean }
-                addClient: { type: boolean }
-            example:
-              nom: "Vendeur Junior"
-              seeStock: true
-              modStock: false
-              seeClients: true
-              modClients: false
-              modSell: true
-              addClient: true
+                full_name:
+                  type: string
+                  example: "Alex"
+                email:
+                  type: string
+                  example: "alexclient@gmail.com"
+                phone:
+                  type: string
+                  example: "514-123-4567"
       responses:
         '201':
-          description: Rôle créé
+          description: Client créé avec succès
 
-  /posts/payement:
-    post:
-      summary: Création d'un paiement
-      description: Enregistre une transaction entre un client, un employé et une voiture.
+  /put/clients/{id}:
+    put:
+      tags:
+        - Client
+      summary: Modification Clients
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
       requestBody:
         required: true
         content:
@@ -226,17 +167,417 @@ paths:
             schema:
               type: object
               properties:
-                id_client: { type: integer }
-                id_voiture: { type: integer }
-                employe_id: { type: integer }
-                date_fin_garantie: { type: string, format: date }
-                prix_vente: { type: number }
-            example:
-              id_client: 40
-              id_voiture: 8
-              employe_id: 3
-              date_fin_garantie: "2026-03-31"
-              prix_vente: 24500.00
+                full_name:
+                  type: string
+                  example: "Lex Icon"
+                email:
+                  type: string
+                  example: "exemple@gmail.com"
+      responses:
+        '200':
+          description: Client modifié avec succès
+
+  /allClient/{id}:
+    get:
+      tags:
+        - Client
+      summary: Les client selon id du clients
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
+      responses:
+        '200':
+          description: Succès
+
+  /delete/client/{id}:
+    delete:
+      tags:
+        - Client
+      summary: Supprimer un client
+      description: Supprime un client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
+      responses:
+        '200':
+          description: Client supprimé
+  # --- FACTURES ---
+  /post/payement:
+    post:
+      tags:
+        - Facture
+      summary: Création Facture
+      description: Création d'un payement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: integer
+                  example: 1
+                voiture_id:
+                  type: integer
+                  example: 1
+                employe_id:
+                  type: integer
+                  example: 1
+                date_fin_garantie:
+                  type: string
+                  format: date
+                  example: "2026-03-31"
+                prix_vente:
+                  type: number
+                  example: 24500.00
       responses:
         '201':
-          description: Paiement enregistré
+          description: Facture créée avec succès
+
+  /allFactures:
+    get:
+      tags:
+        - Facture
+      summary: Tout les facture
+      description: Recuperation des factures
+      responses:
+        '200':
+          description: Succès
+
+  /client/{id}/factures:
+    get:
+      tags:
+        - Facture
+      summary: Facture selon id du client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
+      responses:
+        '200':
+          description: Succès
+
+  /allFactures/{id}:
+    get:
+      tags:
+        - Facture
+      summary: Une facture selon id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
+      responses:
+        '200':
+          description: Succès
+
+  /put/payements/{id}:
+    put:
+      tags:
+        - Facture
+      summary: Modifications Facture
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prix_vente:
+                  type: number
+                  example: 3000
+      responses:
+        '200':
+          description: Facture modifiée
+
+  /delete/payment/{id}:
+    delete:
+      tags:
+        - Facture
+      summary: Supprimer une facture
+      description: suprimer une facture
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
+      responses:
+        '200':
+          description: Facture supprimée
+  # --- VOITURE ---
+  /post/voiture:
+    post:
+      tags:
+        - Voiture
+      summary: Création voiture
+      description: Création d'une voiture
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                modele:
+                  type: string
+                  example: "Tesla Model 3"
+                stock:
+                  type: integer
+                  example: 12
+                couleur:
+                  type: string
+                  example: "Bleu"
+                prix:
+                  type: number
+                  example: 42990.50
+      responses:
+        '201':
+          description: Voiture créée avec succès
+
+  /allVoiture:
+    get:
+      tags:
+        - Voiture
+      summary: Tous les voiture
+      description: Cette route permet de recuperer tout les voitures
+      responses:
+        '200':
+          description: Succès
+
+  /allVoiture/{id}:
+    get:
+      tags:
+        - Voiture
+      summary: Une voiturse selon id
+      description: Cette route permet de recuperer une voiture specifique selon id de la voiture
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
+      responses:
+        '200':
+          description: Succès
+
+  /put/voitures/{id}:
+    put:
+      tags:
+        - Voiture
+      summary: Modifications Voitures
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                modele:
+                  type: string
+                  example: "Toyota"
+                couleur:
+                  type: string
+                  example: "vert"
+      responses:
+        '200':
+          description: Voiture modifiée avec succès
+
+  /delete/voiture/{id}:
+    delete:
+      tags:
+        - Voiture
+      summary: Supprimer une voiture
+      description: Supprimer une facuture
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
+      responses:
+        '200':
+          description: Voiture supprimée
+  # --- ROLE ---
+  /post/role:
+    post:
+      tags:
+        - Role
+      summary: Création rôle
+      description: Création d'un role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                  example: "Vendeur Junior"
+                seeStock:
+                  type: boolean
+                  example: true
+                modStock:
+                  type: boolean
+                  example: false
+                seeClients:
+                  type: boolean
+                  example: true
+                modClients:
+                  type: boolean
+                  example: false
+                modSell:
+                  type: boolean
+                  example: true
+                addClient:
+                  type: boolean
+                  example: true
+      responses:
+        '201':
+          description: Rôle créé avec succès
+
+  /allRole:
+    get:
+      tags:
+        - Role
+      summary: Tous les role
+      description: Cette route permet de recuperer tous les rôles
+      responses:
+        '200':
+          description: Succès
+
+  /allRole/{id}:
+    get:
+      tags:
+        - Role
+      summary: Un role selon id
+      description: Cette route permet de recuperer un role specifique selon id du role
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
+      responses:
+        '200':
+          description: Succès
+
+  /put/roles/{id}:
+    put:
+      tags:
+        - Role
+      summary: Modification Role
+      description: Modifie un role
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                  example: "Vendeur Junior"
+                seeStock:
+                  type: boolean
+                  example: false
+                modClients:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Rôle modifié avec succès
+
+  /delete/role/{id}:
+    delete:
+      tags:
+        - Role
+      summary: Supprimer un role
+      description: Suprime un role
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1"
+      responses:
+        '200':
+          description: Rôle supprimé
+  # --- TOKEN ---
+  /auth/token:
+    post:
+      tags:
+        - Token
+      summary: Création Token
+      description: Permet de créer un token d'authentification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "kerian@test.com"
+                password:
+                  type: string
+                  example: "123456"
+      responses:
+        '200':
+          description: Token généré avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  expiresIn:
+                    type: string
+              # Voici l'exemple qui s'affichera dans Swagger
+              example:
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '401':
+          description: Identifiants invalides

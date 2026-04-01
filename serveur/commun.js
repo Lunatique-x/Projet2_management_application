@@ -24,6 +24,8 @@ const authentifier = (req, res, next) => {
         // pour que la route suivante sache qui parle.
         req.user = userDecoded;
 
+        console.log(token)
+
         // 6. On passe à la suite !
         next();
 

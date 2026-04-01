@@ -8,7 +8,7 @@ const authentifier = require('./commun')
 // On définit la route GET
 
 // Cette route permet de recuperer tout les factures
-app.get('/allFactures',/*authentifier,*/ async (req, res) => {
+app.get('/allFactures', async (req, res) => {
     console.log("Facture");
     // 2. La requête à la base de données
     try {
@@ -19,7 +19,7 @@ app.get('/allFactures',/*authentifier,*/ async (req, res) => {
     }
 });
 //Cette route permet de recuper une facture specifique selon id de la facture
-app.get('/allFactures/:id', /*authentifier,*/ async (req, res) => {
+app.get('/allFactures/:id', async (req, res) => {
     const FactureId = req.params.id;
     try {
         const facture = await db('payement')
@@ -48,7 +48,7 @@ app.get('/allFactures/:id', /*authentifier,*/ async (req, res) => {
 
 
 // cette route permet recuperer tout les Client
-app.get('/allClient',/*authentifier,*/ async (req, res) => {
+app.get('/allClient', async (req, res) => {
     console.log("Client");
     try {
         const result = await db('client').select('*');
@@ -58,7 +58,7 @@ app.get('/allClient',/*authentifier,*/ async (req, res) => {
     }
 });
 //cette route permet recuperer un client specifique selon id du client
-app.get('/allClient/:id',/*authentifier,*/ async (req, res) => {
+app.get('/allClient/:id', async (req, res) => {
     const ClientId  = req.params.id;
     try {
         const client = await db('client')
@@ -83,7 +83,7 @@ app.get('/allClient/:id',/*authentifier,*/ async (req, res) => {
 
 
 // Cette route permet de recuperer tout les voitures
-app.get('/allVoiture',/*authentifier,*/ async (req, res) => {
+app.get('/allVoiture', async (req, res) => {
     console.log("voiture");
     try {
         const result = await db('voiture').select('*');
@@ -93,7 +93,7 @@ app.get('/allVoiture',/*authentifier,*/ async (req, res) => {
     }
 });
 // Cette route permet de recuperer une voiture specifique selon id de la voiture
-app.get('/allVoiture/:id',/*authentifier,*/ async (req, res) => {
+app.get('/allVoiture/:id', async (req, res) => {
     const voitureID = req.params.id;
     try {
         const voiture = await db('voiture')
@@ -119,7 +119,7 @@ app.get('/allVoiture/:id',/*authentifier,*/ async (req, res) => {
 
 
 //Cette route permet de recuperer tout les Role
-app.get('/allRole',/*authentifier,*/ async (req, res) => {
+app.get('/allRole', async (req, res) => {
     console.log("role");
     try {
         const result = await db('role').select('*');
@@ -129,7 +129,7 @@ app.get('/allRole',/*authentifier,*/ async (req, res) => {
     }
 });
 //Cette route permet de recuperer un role specifique selon id du role
-app.get('/allRole/:id',/*authentifier,*/ async (req, res) => {
+app.get('/allRole/:id', async (req, res) => {
     const RoleId = req.params.id;
     try {
         const role = await db('role')
@@ -155,7 +155,7 @@ app.get('/allRole/:id',/*authentifier,*/ async (req, res) => {
 });
 
 // cette route permet de recuperer tout les employes
-app.get('/allEmploye',/*authentifier,*/ async (req, res) => {
+app.get('/allEmploye', async (req, res) => {
     console.log("employe");
     try {
         const result = await db('employe').select('*');
@@ -165,7 +165,7 @@ app.get('/allEmploye',/*authentifier,*/ async (req, res) => {
     }
 });
 // cette route permet de recuperer un employe sepcifique selon id de employe
-app.get('/allEmployee/:id',/*authentifier,*/ async (req, res) => {
+app.get('/allEmployee/:id', async (req, res) => {
     const EmployeId = req.params.id;
     try {
         const employe = await db('employe')
@@ -196,7 +196,7 @@ app.get('/allEmployee/:id',/*authentifier,*/ async (req, res) => {
 
 
 // Cette route permet de recuper les factures d'un client selon id du client
-app.get('/client/:id/factures',/*authentifier,*/ async (req, res) => {
+app.get('/client/:id/factures', async (req, res) => {
     const clientId = req.params.id;
     console.log(`Récupération des factures pour le client ID: ${clientId}`);
 

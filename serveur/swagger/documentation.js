@@ -3,6 +3,7 @@ const app = express();
 const port = 8000;
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
+const authentifier = require('../commun.js');
 
 // 1. Charger le swagger
 const swaggerDocument = YAML.load('./swagger/swagger.yaml');
@@ -16,16 +17,16 @@ const routesGet = require('../get.js');
 const routeAuth = require('../authentification.js');
 const routePost = require('../post.js');
 const routeDelete = require('../delete.js');
+const routePut = require('../put.js');
 
 // 4. Routes
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-
-// Si routeAuth contient .post('/register'), l'URL sera http://localhost:8000/auth/register
-app.use('/', routesGet); 
-app.use('/auth', routeAuth); 
-app.use('/posts', routePost);
-app.use('/delete', routeDelete);
+app.use('/auth', routeAuth);
+app.use('/', authentifier, routesGet);
+app.use('/post',authentifier, routePost);
+app.use('/delete',authentifier, routeDelete);
+app.use('/put',authentifier, routePut);
 
 app.listen(port, () => {
   console.log(`Documentation disponible sur http://localhost:${port}/api-docs`);
