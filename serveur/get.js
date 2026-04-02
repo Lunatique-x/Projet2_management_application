@@ -169,11 +169,11 @@ app.get('/allEmploye', async (req, res) => {
     }
 });
 // cette route permet de recuperer un employe sepcifique selon id de employe
-app.get('/allEmployee/:id', async (req, res) => {
+app.get('/allEmploye/:id', async (req, res) => {
     const employeId = req.params.id;
     try {
         const employe = await db('employe')
-            .join('role', 'employe.role_id', '=', 'role.id_role')
+            .leftJoin('role', 'employe.role_id', '=', 'role.id_role')
             .where('employe.id_employe', employeId)
             
             
