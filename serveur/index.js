@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');;
 const app = express(); // Ici on crée l'application principale
 const port = 3000;
 const path = require('path')
@@ -11,6 +12,7 @@ const authentifier = require('./commun.js');
 
 // Optionnel mais recommandé pour lire le JSON plus tard
 app.use(express.json());
+app.use(cors());
 
 app.use('/auth', routeAuth);
 app.use('/', authentifier, routesGet);
