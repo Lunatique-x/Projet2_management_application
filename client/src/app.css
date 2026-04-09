@@ -1,0 +1,51 @@
+.link {
+    text-decoration: none !important;
+    color: inherit !important;
+    display: block; /* Pour que le lien prenne toute la largeur */
+}
+
+/* L'effet au survol sur la boîte à l'intérieur du lien */
+.link:hover .box {
+    background-color: #f8f9fa !important; /* Un gris très clair */
+    border-color: #3273dc !important;    /* La bordure devient bleue (Bulma primary) */
+    transform: translateX(10px);         /* La boîte se décale légèrement à droite */
+    box-shadow: 2px 5px 15px rgba(0,0,0,0.1); /* Petite ombre portée */
+}
+
+/* Optionnel la sensation du clique */
+/* .link:active .box {
+    transform: translateX(5px);
+    filter: brightness(0.95);
+} */
+
+/* la formed des box */
+.boite{background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    transition: 0.2s;
+    margin-bottom: 20px;
+}
+
+/* le hover lorsque qu'on survole */
+.link:hover .boite {
+    border-color: #3273dc; 
+    background-color: #f8f9fa;
+    transform: translateX(10px);
+}
+
+.siteactuel{
+    background-color: #f0f0f0;      
+    border-color: #b5b5b5;          
+    color: #7a7a7a;                
+    cursor: not-allowed;         
+    pointer-events: none;          
+    opacity: 0.7;                 
+    box-shadow: none;               
+}
+
+.link-disabled:hover .menu-button-custom.is-active {
+    transform: none; 
+    border-color: #b5b5b5;
+}
