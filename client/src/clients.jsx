@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "./app.css"; 
+ 
 
 export function Clients() {
     return (
@@ -9,13 +9,13 @@ export function Clients() {
             paddingTop: '100px',
             marginLeft: '50px'
         }}>
-            <div className="card-box" style={{ width: '300px' }}>
+            <div className="card-box" style={{ maxWidth: '300px' }}>
                 
                 <div className="box">
                     
                    
-                    <Link to="/Clients" className="siteactuel">
-                        <div className="boite is-active">Clients</div>
+                    <Link to="/Client" className="siteactuel">
+                        <div className="boite ">Clients</div>
                     </Link>
 
                     
@@ -23,11 +23,11 @@ export function Clients() {
                         <div className="boite">Voitures</div>
                     </Link>
 
-                    <Link to="/Factures" className="link">
+                    <Link to="/Facture" className="link">
                         <div className="boite">Factures</div>
                     </Link>
 
-                    <Link to="/Employes" className="link">
+                    <Link to="/Employe" className="link">
                         <div className="boite">Employés</div>
                     </Link>
                 </div>

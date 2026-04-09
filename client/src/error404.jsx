@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 
 export function Error404() { 
     return (
+        
         <div className="section"> 
+        <div><p>4040</p></div>
             <div className="card-box" style={{ maxWidth: '300px' }}>
                 {/* La grande boîte */}
                 <div className="box" style={{ backgroundColor: '#f5f5f5' }}>

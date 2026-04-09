@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import "./app.css"
+
 
 
 export function Home() { 
@@ -17,16 +17,16 @@ export function Home() {
 
 
                     {/* Chaque élément devient sa propre petite boîte */}
-                    <Link to="/Clients" className="link">
+                    <Link to="/Client" className="link">
                     <div className="boite " >Clients</div>
                     </Link>
                      <Link to="/Voiture"className="link" >
                     <div className="boite" >Voitures</div>
                     </Link>
-                     <Link to="/Factures"className="link" >
+                     <Link to="/Facture"className="link" >
                     <div className="boite" >Factures</div>
                     </Link>
-                     <Link to="/Voiture"className="link" >
+                     <Link to="/Employe"className="link" >
                     <div className="boite" >Employés</div>
                     </Link>
                 </div>
