@@ -8,7 +8,7 @@ Le token a une durée de 9h
 
 # Pour lancer le serveur
 1. Dans le terminal soyer dans le dossier serveur, puis npm install
-2. Lancer le serveur avec npm run dev
+2. Lancer le serveur avec node .\index.js
 
 # Pour lancer le frontend
 1. Dans le terminal soyer maintenant dans client, puis npm install
