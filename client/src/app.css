@@ -1,7 +1,9 @@
+/*Dans les box*/
 .link {
     text-decoration: none !important;
     color: inherit !important;
     display: block; /* Pour que le lien prenne toute la largeur */
+    -webkit-text-fill-color: black;/* Couleur text */
 }
 
 /* L'effet au survol sur la boîte à l'intérieur du lien */

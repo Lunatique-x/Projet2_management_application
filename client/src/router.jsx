@@ -23,7 +23,7 @@ export function Router() {
                 <Route path="/Employe" element={<Employe />} />
                     
             {/* </Route> */}
-            <Route path="/login" element={<Login />} />
+            <Route path="/Login" element={<Login />} />
             <Route path="*" element={<Error404 />} />
 
 

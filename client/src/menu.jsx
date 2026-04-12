@@ -1,7 +1,16 @@
-import { Link, useNavigate } from "react-router-dom"; // On ajoute useNavigate
+import { Link, useNavigate,useLocation } from "react-router-dom"; // On ajoute useNavigate
 
 export function Menu() {
   const navigate = useNavigate(); // On initialise la fonction de navigation
+  const location = useLocation();
+
+  const token = localStorage.getItem('token');
+  const isLoginPage = location.pathname.toLowerCase() === "/login";
+  
+  // Si on est sur le login, ou si on n'a pas de token, on ne renvoie rien (null)
+  if (isLoginPage || !token) {
+    return null;
+  }
 
   const handleLogout = () => {
     // 1. Ici, tu ajouteras plus tard ta logique (supprimer le token, vider le localStorage, etc.)
