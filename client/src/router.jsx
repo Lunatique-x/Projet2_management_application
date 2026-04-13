@@ -16,7 +16,7 @@ export function Router() {
         <Menu />
         <Routes >
             {/* <Route element={<ProtectedRoute />}> */}
-                <Route path="/homes" element={<Home />} />
+                <Route path="/home" element={<Home />} />
                 <Route path="/clients" element={<Clients />} />
                 <Route path="/voitures" element={<Voiture />} />
                 <Route path="/factures" element={<Factures />} />

@@ -19,15 +19,15 @@ export function Menu() {
     localStorage.removeItem('token');
 
     // 2. Redirection vers la page de connexion
-    navigate("/login"); 
+    navigate("/"); 
   };
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
-      <div className="navbar-menu" style={{ display: 'flex', width: '100%' }}>
+      <div className="navbar-menu" style={{ display: 'flex', width: '100%',backgroundColor:"white",borderRadius: "12px",overflow: "hidden" }}>
         
         {/* Ce qui reste à gauche */}
         <div className="navbar-start">
-          <Link to="/homes" className="navbar-item">
+          <Link to="/home" className="navbar-item">
             Home
           </Link>
         </div>

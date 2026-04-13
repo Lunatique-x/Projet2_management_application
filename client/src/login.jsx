@@ -26,7 +26,7 @@ export function Login() {
         localStorage.setItem('token', data.token);
         
         //Redirection
-        navigate("/"); // Redirige vers la home 
+        navigate("/home"); // Redirige vers la home 
       } else {
         setError(data.message || "Identifiants incorrects");//data.message prend erreur du serveur
       }
