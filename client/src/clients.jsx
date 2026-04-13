@@ -7,7 +7,7 @@ export function Clients() {
     const [client, setClient] = useState([]);
     useEffect(() => {
         async function getClient() {
-            const res = await fetch("http://localhost:3000/client", {
+            const res = await fetch("http://localhost:3000/allClient", {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`,
