@@ -4,11 +4,12 @@ export function Menu() {
   const navigate = useNavigate(); // On initialise la fonction de navigation
   const location = useLocation();
 
-  const token = localStorage.getItem('token');
-  const isLoginPage = location.pathname.toLowerCase() === "/login";
+  
+  const isLoginPage = location.pathname.toLowerCase() === "/";
+  
   
   // Si on est sur le login, ou si on n'a pas de token, on ne renvoie rien (null)
-  if (isLoginPage || !token) {
+  if (isLoginPage ) {
     return null;
   }
 
@@ -26,7 +27,7 @@ export function Menu() {
         
         {/* Ce qui reste à gauche */}
         <div className="navbar-start">
-          <Link to="/" className="navbar-item">
+          <Link to="/homes" className="navbar-item">
             Home
           </Link>
         </div>

@@ -15,20 +15,20 @@ export function Voiture() {
                 <div className="box">
                     
                    
-                    <Link to="/Client" className="link">
+                    <Link to="/clients" className="link">
                         <div className="boite ">Clients</div>
                     </Link>
 
                     
-                    <Link to="/Voiture" className="siteactuel">
+                    <Link to="/voitures" className="siteactuel">
                         <div className="boite">Voitures</div>
                     </Link>
 
-                    <Link to="/Facture" className="link">
+                    <Link to="/factures" className="link">
                         <div className="boite">Factures</div>
                     </Link>
 
-                    <Link to="/Employe" className="link">
+                    <Link to="/employes" className="link">
                         <div className="boite">Employés</div>
                     </Link>
                 </div>

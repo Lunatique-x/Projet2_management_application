@@ -16,14 +16,14 @@ export function Router() {
         <Menu />
         <Routes >
             {/* <Route element={<ProtectedRoute />}> */}
-                <Route path="/" element={<Home />} />
-                <Route path="/Client" element={<Clients />} />
-                <Route path="/Voiture" element={<Voiture />} />
-                <Route path="/Facture" element={<Factures />} />
-                <Route path="/Employe" element={<Employe />} />
+                <Route path="/homes" element={<Home />} />
+                <Route path="/clients" element={<Clients />} />
+                <Route path="/voitures" element={<Voiture />} />
+                <Route path="/factures" element={<Factures />} />
+                <Route path="/employes" element={<Employe />} />
                     
             {/* </Route> */}
-            <Route path="/Login" element={<Login />} />
+            <Route path="/" element={<Login />} />
             <Route path="*" element={<Error404 />} />
 
 
