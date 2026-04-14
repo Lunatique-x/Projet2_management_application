@@ -1,4 +1,5 @@
 const knex = require('knex');
+const bcrypt = require('bcrypt');
 
 const db = knex({
   client: 'sqlite3',
@@ -50,6 +51,8 @@ if (!existsRole) {
     });
   }
 
+  await seedAdminRoleAndUser();
+
   // ---- client ----
   const existsClient = await db.schema.hasTable("client");
   if (!existsClient) {
@@ -98,8 +101,38 @@ if (!existsRole) {
            .inTable("employe")
            .onDelete("SET NULL");
     });
+  }
 }
 
+async function seedAdminRoleAndUser() {
+  const adminRoleName = 'admin';
+  let adminRole = await db('role').where({ nom: adminRoleName }).first();
+
+  if (!adminRole) {
+    await db('role').insert({
+      nom: adminRoleName,
+      seeStock: true,
+      modStock: true,
+      seeClients: true,
+      modClients: true,
+      modSell: true,
+      addClient: true
+    });
+    adminRole = await db('role').where({ nom: adminRoleName }).first();
+  }
+
+
+  if (!adminUser) {
+    const hashedPassword = await bcrypt.hash('placeholder', 10);
+    await db('employe').insert({
+      full_name: 'Sebastien',
+      email: 'sebastien67@gmail.com',
+      password: hashedPassword,
+      phone: '0000000000',
+      commission: 0,
+      role_id: adminRole.id_role
+    });
+  }
 }
 
 // call function
