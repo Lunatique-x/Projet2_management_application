@@ -121,7 +121,7 @@ async function seedAdminRoleAndUser() {
     adminRole = await db('role').where({ nom: adminRoleName }).first();
   }
 
-
+  const adminUser = await db('employe').where({ email: 'sebastien67@gmail.com' }).first();
   if (!adminUser) {
     const hashedPassword = await bcrypt.hash('placeholder', 10);
     await db('employe').insert({
