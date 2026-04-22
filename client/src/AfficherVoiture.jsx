@@ -22,7 +22,7 @@ export function AfficherVoiture(props) {
                         </div>
                         <div className="mb-0">
                             <span className="has-text-weight-bold">Prix : </span>
-                            <span>{voiture.prix} Ar</span>
+                            <span>{voiture.prix} $</span>
                         </div>
                     </div>
                 </div>
