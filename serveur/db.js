@@ -1,10 +1,11 @@
 const knex = require('knex');
 const bcrypt = require('bcrypt');
+const path = require('path');
 
 const db = knex({
   client: 'sqlite3',
   connection: {
-    filename: './db.sqlite3'
+    filename: path.join(__dirname, 'db.sqlite3')
   },
   useNullAsDefault: true
 });
@@ -102,6 +103,8 @@ if (!existsRole) {
            .onDelete("SET NULL");
     });
   }
+
+  await seedSampleData();
 }
 
 async function seedAdminRoleAndUser() {
@@ -121,17 +124,61 @@ async function seedAdminRoleAndUser() {
     adminRole = await db('role').where({ nom: adminRoleName }).first();
   }
 
+  let adminUser = await db('employe').where({ email: 'admin@gmail.com' }).first();
+
 
   if (!adminUser) {
-    const hashedPassword = await bcrypt.hash('placeholder', 10);
+    const hashedPassword = await bcrypt.hash('123456', 10);
     await db('employe').insert({
       full_name: 'Sebastien',
-      email: 'sebastien67@gmail.com',
+      email: 'admin@gmail.com',
       password: hashedPassword,
       phone: '0000000000',
       commission: 0,
       role_id: adminRole.id_role
     });
+  }
+}
+
+async function seedSampleData() {
+  const clientCount = await db('client').count({ count: '*' }).first();
+  if (Number(clientCount.count) === 0) {
+    await db('client').insert([
+      {
+        full_name: 'Marie Rakoto',
+        email: 'marie@example.com',
+        phone: '0340000001'
+      },
+      {
+        full_name: 'Jean Randria',
+        email: 'jean@example.com',
+        phone: '0340000002'
+      }
+    ]);
+  }
+
+  const voitureCount = await db('voiture').count({ count: '*' }).first();
+  if (Number(voitureCount.count) === 0) {
+    await db('voiture').insert([
+      {
+        modele: 'Toyota Corolla',
+        stock: 4,
+        couleur: 'Blanc',
+        prix: 55000000
+      },
+      {
+        modele: 'Hyundai Tucson',
+        stock: 2,
+        couleur: 'Gris',
+        prix: 98000000
+      },
+      {
+        modele: 'Suzuki Swift',
+        stock: 5,
+        couleur: 'Rouge',
+        prix: 42000000
+      }
+    ]);
   }
 }
 
