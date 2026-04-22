@@ -5,14 +5,8 @@ export function AfficherVoiture(props) {
         <div className="column is-3-desktop is-4-tablet is-6-mobile">
             <div
                 className="card has-text-black"
-                style={{ backgroundColor: '#f5f5f5', borderRadius: '0 0 5px 5px' }}
+                style={{ backgroundColor: '#f5f5f5', borderRadius: '5px' }}
             >
-                <figure className="image is-square">
-                    <img
-                        src={voiture.imgUrl ? voiture.imgUrl : 'https://placehold.co/600x600?text=Voiture'}
-                        alt={voiture.modele}
-                    />
-                </figure>
                 <div className="card-content">
                     <div className="content">
                         <h3 className="title is-4 has-text-centered has-text-black">
