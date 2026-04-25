@@ -1,3 +1,18 @@
+/* On cible le container qui est juste après le root */
+#root > .container {
+    max-width: none !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+}
+
+/* On s'assure que Bulma ne rajoute pas de marge automatique */
+.container {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
 /*Dans les box*/
 .link {
     text-decoration: none !important;

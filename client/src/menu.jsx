@@ -1,49 +1,51 @@
-import { Link, useNavigate,useLocation } from "react-router-dom"; // On ajoute useNavigate
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export function Menu() {
-  const navigate = useNavigate(); // On initialise la fonction de navigation
+  const navigate = useNavigate();
   const location = useLocation();
 
-  
   const isLoginPage = location.pathname.toLowerCase() === "/";
-  
-  
-  // Si on est sur le login, ou si on n'a pas de token, on ne renvoie rien (null)
-  if (isLoginPage ) {
+
+  if (isLoginPage) {
     return null;
   }
 
   const handleLogout = () => {
-    // 1. Ici, tu ajouteras plus tard ta logique (supprimer le token, vider le localStorage, etc.)
-    console.log("Utilisateur déconnecté");
     localStorage.removeItem('token');
-
-    // 2. Redirection vers la page de connexion
-    navigate("/"); 
+    navigate("/");
   };
+
   return (
-    <nav className="navbar" role="navigation" aria-label="main navigation">
-      <div className="navbar-menu" style={{ display: 'flex', width: '100%',backgroundColor:"white",borderRadius: "12px",overflow: "hidden" }}>
-        
-        {/* Ce qui reste à gauche */}
-        <div className="navbar-start">
-          <Link to="/home" className="navbar-item">
+    <nav className="navbar" role="navigation" aria-label="main navigation" 
+         style={{ backgroundColor: 'transparent' }}> {/* On s'assure que la barre est transparente ou de la bonne couleur */}
+      
+      <div className="container is-fluid" style={{
+        display: 'flex', 
+        width: '100%', 
+        maxWidth: '100%',
+        paddingLeft: '40px',  // On donne du souffle à gauche (aligné avec tes boutons Clients)
+        paddingRight: '40px', // On donne du souffle à droite pour le bouton Déconnexion
+        margin: '0'
+      }}>
+
+        <div className="navbar-brand">
+          <Link to="/home" className="navbar-item" style={{ paddingLeft: '0' }}>
             Home
           </Link>
         </div>
 
-        <div className="navbar-end" style={{ marginLeft: 'auto' }}>
-          <div className="navbar-item">
-            {/* On utilise onClick pour appeler notre fonction */}
-            <button 
-              className="button is-danger" 
-              onClick={handleLogout}
-            >
-              Déconnexion
-            </button>
+        <div className="navbar-menu is-active" style={{ display: 'flex', flexGrow: 1, backgroundColor: 'transparent' }}>
+          <div className="navbar-end" style={{ marginLeft: 'auto', display: 'flex' }}>
+            <div className="navbar-item" style={{ paddingRight: '0' }}>
+              <button
+                className="button is-danger"
+                onClick={handleLogout}
+              >
+                Déconnexion
+              </button>
+            </div>
           </div>
         </div>
-
       </div>
     </nav>
   );

@@ -38,7 +38,7 @@ export function Clients() {
             display: 'flex',
             justifyContent: 'flex-start',
             paddingTop: '100px',
-            marginLeft: '50px'
+            marginLeft: '25px'
         }}>
             <div className="card-box" style={{ maxWidth: '300px' }}>
                 
@@ -61,6 +61,10 @@ export function Clients() {
                     <Link to="/employes" className="link">
                         <div className="boite">Employés</div>
                     </Link>
+                     <Link to="/roles"className="link" >
+                    <div className="boite" >Role</div>
+                    </Link>
+
                 </div>
             </div>
             <div className="container">

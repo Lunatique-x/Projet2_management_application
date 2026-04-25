@@ -36,7 +36,7 @@ export function Login() {
   };
 
   return (
-  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f5f5f5' }}>
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
     <div className="box" style={{ width: '100%', maxWidth: '400px', borderRadius: '15px', border: '2px solid #3273dc', padding: '2rem' }}>
       
       {/* Le titre  centré */}

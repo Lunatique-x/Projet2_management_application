@@ -8,10 +8,11 @@ import { Factures } from "./factures";
 import { Login } from "./login";
 import { Error404 } from "./error404";
 import { Employe } from "./employe";
+import { Roles } from "./role";
 
 export function Router() {
   return (
-    <div className="container">
+    <div className="container is-fluid">
       <BrowserRouter>
         <Menu />
         <Routes >
@@ -21,6 +22,7 @@ export function Router() {
                 <Route path="/voitures" element={<Voiture />} />
                 <Route path="/factures" element={<Factures />} />
                 <Route path="/employes" element={<Employe />} />
+                <Route path="/roles" element={<Roles />} />
                     
             {/* </Route> */}
             <Route path="/" element={<Login />} />
