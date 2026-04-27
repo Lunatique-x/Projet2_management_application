@@ -2,11 +2,14 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AfficherClient } from "./Client/AfficherClient";
 import { CreeClient } from "./Client/CreeClient";
+import { ModifierClient } from "./Client/ModifierSupprimerClient";
  
 
 export function Clients() {
     const [client, setClient] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedClient, setSelectedClient] = useState(null);
 
     useEffect(() => {
         getClient();
@@ -27,6 +30,15 @@ export function Clients() {
     }
 
     const handleClientCreated = () => {
+        getClient();
+    };
+
+    const handleEditClick = (clientToEdit) => {
+        setSelectedClient(clientToEdit);
+        setIsEditModalOpen(true);
+    };
+
+    const handleClientModified = () => {
         getClient();
     };
 
@@ -81,7 +93,7 @@ export function Clients() {
                 <div className="section">
                     <div className="row columns is-multiline is-mobile">
                         {client.map((c) => {
-                            return <AfficherClient key={c.id_client} client={c} />;
+                            return <AfficherClient key={c.id_client} client={c} onEditClick={handleEditClick} />;
                         })}
                     </div>
                 </div>
@@ -90,6 +102,12 @@ export function Clients() {
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)}
                 onClientCreated={handleClientCreated}
+            />
+            <ModifierClient 
+                isOpen={isEditModalOpen} 
+                onClose={() => setIsEditModalOpen(false)}
+                onClientModified={handleClientModified}
+                client={selectedClient}
             />
         </div>
     );

@@ -1,8 +1,9 @@
 export function AfficherClient(props) {
     return (
-        <div className="column is-4-desktop is-4-tablet is-6-mobile">
+        <div className="column is-3-desktop is-4-tablet is-6-mobile">
             <div className="card has-text-black"
-                style={{ backgroundColor: '#f5f5f5', borderRadius: '5px 5px 5px 5px' }}>
+                style={{ backgroundColor: '#f5f5f5', borderRadius: '5px 5px 5px 5px', cursor: 'pointer' }}
+                onClick={() => props.onEditClick(props.client)}>
                 <div className="card-content">
                     <div className="content">
                         <h3 className="title is-3 has-text-centered has-text-black">
