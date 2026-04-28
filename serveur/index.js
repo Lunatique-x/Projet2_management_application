@@ -9,6 +9,7 @@ const routePost = require('./post.js') // Importation des routes posts
 const routeDelete = require('./delete.js') // Importation des routes deletes
 const routePut = require('./put.js'); // Importation des Puts
 const authentifier = require('./commun.js');
+const { initializeDatabase } = require('./db');
 
 // Optionnel mais recommandé pour lire le JSON plus tard
 app.use(express.json());
@@ -27,7 +28,14 @@ app.use('/put',authentifier, routePut);
 //     res.sendFile(path.join(__dirname, "../Client", "index.html"))
 // })
 
-// Lance le serveur
-app.listen(port, () => {
-  console.log(` Serveur actif sur http://localhost:${port}`);
-});
+// Lance le serveur après l'initialisation de la base de données
+initializeDatabase()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Serveur actif sur http://localhost:${port}`);
+    });
+  })
+  .catch((error) => {
+    console.error('Impossible d\'initialiser la base de données :', error);
+    process.exit(1);
+  });

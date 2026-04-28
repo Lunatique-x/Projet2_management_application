@@ -63,9 +63,9 @@ app.post("/token", async (req, res) => {
 
         // Générer le token
         const token = jwt.sign(
-            { id: user.id, email: user.email }, // payload
-            "projet2Maisonneuve",               // clé secrète
-            { expiresIn: '9h' }                 // Durée
+            { id: user.id_employe, email: user.email }, // payload
+            "projet2Maisonneuve",                     // clé secrète
+            { expiresIn: '9h' }                         // Durée
         );
 
         // Retourner le token

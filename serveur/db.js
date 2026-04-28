@@ -1,18 +1,18 @@
+const path = require('path');
 const knex = require('knex');
 const bcrypt = require('bcrypt');
 
 const db = knex({
   client: 'sqlite3',
   connection: {
-    filename: './db.sqlite3'
+    filename: path.join(__dirname, 'db.sqlite3')
   },
   useNullAsDefault: true
 });
 
-// Enable foreign keys
-db.raw('PRAGMA foreign_keys = ON');
-
 async function createTables() {
+  // Enable foreign keys before creating tables
+  await db.raw('PRAGMA foreign_keys = ON');
 
   // ---- role ----
   const existsRole = await db.schema.hasTable("role");
@@ -137,7 +137,10 @@ async function seedAdminRoleAndUser() {
   }
 }
 
-// call function
-createTables();
+// Initialize database schema and seed admin data
+createTables().catch((error) => {
+  console.error('Database initialization error:', error);
+});
 
 module.exports = db;
+module.exports.initializeDatabase = createTables;
