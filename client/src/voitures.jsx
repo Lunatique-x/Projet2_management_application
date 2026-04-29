@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { AfficherVoiture } from "./AfficherVoiture";
+import { AfficherVoiture } from "./Voiture/AfficherVoiture";
 import { CreeVoiture } from "./Voiture/CreeVoiture";
 
 export function Voiture() {
