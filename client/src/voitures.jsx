@@ -74,7 +74,7 @@ export function Voiture() {
                             className="button is-primary"
                             onClick={() => setIsModalOpen(true)}
                         >
-                            Créer Voiture
+                            Ajouter une voiture
                         </button>
                     </div>
                 </div>
