@@ -1,9 +1,30 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { AfficherEmploye } from "./AfficherEmploye";
 
+export function Employe() {
+    const [employes, setEmployes] = useState([]);
 
+    useEffect(() => {
+        async function getEmployes() {
+            const res = await fetch("http://localhost:3000/allEmploye", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                    "Content-Type": "application/json"
+                }
+            });
 
-export function Employe() { 
-     return (
+            if (res.ok) {
+                const data = await res.json();
+                setEmployes(data);
+            }
+        }
+
+        getEmployes();
+    }, []);
+
+    return (
         <div className="section" style={{
             display: 'flex',
             justifyContent: 'flex-start',
@@ -16,7 +37,7 @@ export function Employe() {
                     
                    
                     <Link to="/clients" className="link">
-                        <div className="boite is-active">Clients</div>
+                        <div className="boite ">Clients</div>
                     </Link>
 
                     
@@ -35,6 +56,15 @@ export function Employe() {
                     <div className="boite" >Role</div>
                     </Link>
 
+                </div>
+            </div>
+            <div className="container">
+                <div className="section">
+                    <div className="row columns is-multiline is-mobile">
+                        {employes.map((employe) => {
+                            return <AfficherEmploye key={employe.id_employe} employe={employe} />;
+                        })}
+                    </div>
                 </div>
             </div>
         </div>
