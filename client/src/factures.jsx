@@ -1,31 +1,38 @@
 import { Link, useNavigate } from "react-router-dom";
-import { AfficherFacture } from "./AfficherFacture";
+import { AfficherFacture } from "./Facture/AfficherFacture";
 import { useState, useEffect } from "react";
+import { CreeFacture } from "./Facture/CreeFacture";
 
 
 export function Factures() {
     const [factures, setFactures] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
-        async function getFactures() {
-            // Assure-toi que l'URL correspond à ta route backend pour les paiements
-            const res = await fetch("http://localhost:3000/allFactures", { 
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem('token')}`,
-                    "Content-Type": "application/json"
-                }
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                setFactures(data);
-            } else {
-                console.error("Erreur lors de la récupération des factures");
-            }
-        }
         getFactures();
     }, []);
+
+    async function getFactures() {
+        const res = await fetch("http://localhost:3000/allFactures", { 
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            setFactures(data);
+        } else {
+            console.error("Erreur lors de la récupération des factures");
+        }
+    }
+
+    const handleFactureCreated = () => {
+        getFactures();
+    };
+
     return (
         <div className="section" style={{
             display: 'flex',
@@ -62,6 +69,16 @@ export function Factures() {
             </div>
             <div className="container">
                 <div className="section">
+                    <div className="row">
+                        <button 
+                            className="button is-primary"
+                            onClick={() => setIsModalOpen(true)}
+                        >
+                            Créer une Facture
+                        </button>
+                    </div>
+                </div>
+                <div className="section">
                     <div className="row columns is-multiline is-mobile">
                         {factures.map((f) => {
                             return <AfficherFacture key={f.id_payement} facture={f} />;
@@ -69,6 +86,11 @@ export function Factures() {
                     </div>
                 </div>
             </div>
+            <CreeFacture 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)}
+                onFactureCreated={handleFactureCreated}
+            />
         </div>
     );
 }
