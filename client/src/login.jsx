@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState,useContext } from "react";
 import { useNavigate } from "react-router-dom"; // Pour une redirection propre
+import { AuthContext } from "./AuthContext";
 
 export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate(); 
+//utilisation du use contexte
+  const { login } = useContext(AuthContext);
 
   const PageSubmit = async (e) => {
     e.preventDefault();
@@ -22,6 +25,8 @@ export function Login() {
       const data = await response.json();
 
       if (response.ok) {
+        // application des roles dans les donnés
+        login(data.user);
         // token dans le localStorage
         localStorage.setItem('token', data.token);
         

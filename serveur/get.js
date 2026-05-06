@@ -1,6 +1,7 @@
 const express = require('express');
 const port = 3000;
-const db = require('./db');
+//const  db  = require('./db'); V1
+const { db } = require('./db');//V2
 const app = express.Router();
 const jwt = require('jsonwebtoken');
 const authentifier = require('./commun')

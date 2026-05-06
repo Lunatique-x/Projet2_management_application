@@ -1,7 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcrypt')
 const app = express.Router();
-const db = require('./db');
+//const  db  = require('./db'); V1
+const { db } = require('./db');//V2
 const port = 3000;
 const authentifier = require('./commun.js')
 

@@ -2,10 +2,18 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AfficherVoiture } from "./Voiture/AfficherVoiture";
 import { CreeVoiture } from "./Voiture/CreeVoiture";
+import { useContext } from "react";
+import { AuthContext } from "./AuthContext";
 
 export function Voiture() {
+    const { user } = useContext(AuthContext);
+
     const [voitures, setVoitures] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    if (!user || user.seeStock !== 1) {
+        return <div className="section">Accès refusé : vous n'avez pas la permission de voir les facutures.</div>;
+    }
 
     useEffect(() => {
         async function getVoitures() {
@@ -45,32 +53,39 @@ export function Voiture() {
         }}>
             <div className="card-box" style={{ maxWidth: '300px' }}>
                 <div className="box">
-                    <Link to="/clients" className="link">
-                        <div className="boite ">Clients</div>
-                    </Link>
+
+                    {user.seeClients === 1 && (
+                        <Link to="/clients" className="link">
+                            <div className="boite ">Clients</div>
+                        </Link>
+                    )}
 
                     <Link to="/voitures" className="siteactuel">
                         <div className="boite">Voitures</div>
                     </Link>
+                    {user.modSell === 1 && (
+                        <Link to="/factures" className="link">
+                            <div className="boite">Factures</div>
+                        </Link>
+                    )}
+                    {user.role_name === "admin" && (
+                        <>
+                            <Link to="/employes" className="link">
+                                <div className="boite">Employés</div>
+                            </Link>
 
-                    <Link to="/factures" className="link">
-                        <div className="boite">Factures</div>
-                    </Link>
-
-                    <Link to="/employes" className="link">
-                        <div className="boite">Employés</div>
-                    </Link>
-
-                    <Link to="/roles" className="link">
-                        <div className="boite">Role</div>
-                    </Link>
+                            <Link to="/roles" className="link">
+                                <div className="boite">Role</div>
+                            </Link>
+                        </>
+                    )}
                 </div>
             </div>
 
             <div className="container">
                 <div className="section">
                     <div className="row">
-                        <button 
+                        <button
                             className="button is-primary"
                             onClick={() => setIsModalOpen(true)}
                         >
@@ -87,8 +102,8 @@ export function Voiture() {
                 </div>
             </div>
 
-            <CreeVoiture 
-                isOpen={isModalOpen} 
+            <CreeVoiture
+                isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onVoitureCreated={handleVoitureCreated}
             />

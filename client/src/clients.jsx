@@ -3,13 +3,21 @@ import { useEffect, useState } from "react";
 import { AfficherClient } from "./Client/AfficherClient";
 import { CreeClient } from "./Client/CreeClient";
 import { ModifierClient } from "./Client/ModifierSupprimerClient";
+import { useContext } from "react";
+import { AuthContext } from "./AuthContext";
  
 
 export function Clients() {
+    //useContexte
+    const { user } = useContext(AuthContext);
     const [client, setClient] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedClient, setSelectedClient] = useState(null);
+
+    if (!user || user.seeClients !== 1) {
+        return <div className="section">Accès refusé : vous n'avez pas la permission de voir les clients.</div>;
+    }
 
     useEffect(() => {
         getClient();
@@ -61,21 +69,26 @@ export function Clients() {
                         <div className="boite ">Clients</div>
                     </Link>
 
-                    
+                    {user.seeStock === 1 && (
                     <Link to="/voitures" className="link">
                         <div className="boite">Voitures</div>
                     </Link>
-
+                    )}
+                    {user.modSell === 1 && (
                     <Link to="/factures" className="link">
                         <div className="boite">Factures</div>
                     </Link>
-
+                    )}
+                    {user.role_name === "admin" && (
+                        <>
                     <Link to="/employes" className="link">
                         <div className="boite">Employés</div>
                     </Link>
                      <Link to="/roles"className="link" >
                     <div className="boite" >Role</div>
                     </Link>
+                    </>
+                    )}
 
                 </div>
             </div>

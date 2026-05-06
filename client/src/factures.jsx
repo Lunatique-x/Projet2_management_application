@@ -2,11 +2,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { AfficherFacture } from "./Facture/AfficherFacture";
 import { useState, useEffect } from "react";
 import { CreeFacture } from "./Facture/CreeFacture";
+import { useContext } from "react";
+import { AuthContext } from "./AuthContext";
+
 
 
 export function Factures() {
+    //useContexte
+    const { user } = useContext(AuthContext);
     const [factures, setFactures] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+    if (!user || user.modSell !== 1) {
+        return <div className="section">Accès refusé : vous n'avez pas la permission de voir les facutures.</div>;
+    }
 
     useEffect(() => {
         getFactures();
@@ -44,26 +54,32 @@ export function Factures() {
 
                 <div className="box">
 
-
+                    {user.seeClients === 1 && (
                     <Link to="/clients" className="link">
                         <div className="boite ">Clients</div>
                     </Link>
+                    )}
 
-
+                    {user.seeStock === 1 && (
                     <Link to="/voitures" className="link">
                         <div className="boite">Voitures</div>
                     </Link>
+                    )}
 
                     <Link to="/factures" className="siteactuel">
                         <div className="boite">Factures</div>
                     </Link>
-
+                    {user.role_name === "admin" && (  
+                    <>
+                      
                     <Link to="/employes" className="link">
                         <div className="boite">Employés</div>
                     </Link>
                      <Link to="/roles"className="link" >
                     <div className="boite" >Role</div>
                     </Link>
+                    </>
+                    )}
 
                 </div>
             </div>

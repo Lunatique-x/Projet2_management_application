@@ -138,9 +138,16 @@ async function seedAdminRoleAndUser() {
 }
 
 // Initialize database schema and seed admin data
-createTables().catch((error) => {
-  console.error('Database initialization error:', error);
-});
+// createTables().catch((error) => {
+//   console.error('Database initialization error:', error);
+// });
 
-module.exports = db;
-module.exports.initializeDatabase = createTables;
+// module.exports = db;
+// module.exports.initializeDatabase = createTables;
+
+
+
+module.exports = {
+  db,
+  initializeDatabase: createTables
+};
