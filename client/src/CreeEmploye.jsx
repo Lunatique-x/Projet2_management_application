@@ -50,13 +50,16 @@ export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
         setIsLoading(true);
 
         try {
-            const res = await fetch("http://localhost:3000/employe", {
+            const res = await fetch("http://localhost:3000/auth/register", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({
+                    ...formData,
+                    role_id: formData.id_role // Change parameter name for the API
+                })
             });
 
             if (res.ok) {
