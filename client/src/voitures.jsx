@@ -10,6 +10,8 @@ export function Voiture() {
 
     const [voitures, setVoitures] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const voituresPerPage = 8;
 
     if (!user || user.seeStock !== 1) {
         return <div className="section">Accès refusé : vous n'avez pas la permission de voir les facutures.</div>;
@@ -43,6 +45,20 @@ export function Voiture() {
             }
         }).then(res => res.json()).then(data => setVoitures(data));
     };
+
+    const totalPages = Math.ceil(voitures.length / voituresPerPage);
+    const startIndex = (currentPage - 1) * voituresPerPage;
+    const currentVoitures = voitures.slice(startIndex, startIndex + voituresPerPage);
+
+    useEffect(() => {
+        if (totalPages > 0 && currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+
+        if (totalPages === 0 && currentPage !== 1) {
+            setCurrentPage(1);
+        }
+    }, [currentPage, totalPages]);
 
     return (
         <div className="section" style={{
@@ -95,11 +111,46 @@ export function Voiture() {
                 </div>
                 <div className="section">
                     <div className="row columns is-multiline is-mobile">
-                        {voitures.map((voiture) => {
+                        {currentVoitures.map((voiture) => {
                             return <AfficherVoiture key={voiture.id_voiture} voiture={voiture} />;
                         })}
                     </div>
                 </div>
+
+                {totalPages > 1 && (
+                    <div className="section" style={{ display: 'flex', justifyContent: 'center' }}>
+                        <nav className="pagination" role="navigation" aria-label="pagination">
+                            <button
+                                className="pagination-previous"
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                            >
+                                Précédent
+                            </button>
+                            <button
+                                className="pagination-next"
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                            >
+                                Suivant
+                            </button>
+                            <ul className="pagination-list">
+                                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                                    <li key={page}>
+                                        <button
+                                            className={`pagination-link ${currentPage === page ? 'is-current' : ''}`}
+                                            aria-label={`Page ${page}`}
+                                            aria-current={currentPage === page ? 'page' : undefined}
+                                            onClick={() => setCurrentPage(page)}
+                                        >
+                                            {page}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </nav>
+                    </div>
+                )}
             </div>
 
             <CreeVoiture

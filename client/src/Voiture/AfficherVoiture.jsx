@@ -1,11 +1,12 @@
 export function AfficherVoiture(props) {
     const voiture = props.voiture;
+    const onEditClick = props.onEditClick;
 
     return (
         <div className="column is-3-desktop is-4-tablet is-6-mobile">
             <div
                 className="card has-text-black"
-                style={{ backgroundColor: '#f5f5f5', borderRadius: '5px' }}
+                style={{ backgroundColor: "#f5f5f5", borderRadius: "5px" }}
             >
                 <div className="card-content">
                     <div className="content">
