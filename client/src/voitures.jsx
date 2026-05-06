@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AfficherVoiture } from "./Voiture/AfficherVoiture";
 import { CreeVoiture } from "./Voiture/CreeVoiture";
+import { ModifierVoiture } from "./Voiture/ModifierVoiture";
 import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
 
@@ -10,8 +11,10 @@ export function Voiture() {
 
     const [voitures, setVoitures] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedVoiture, setSelectedVoiture] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const voituresPerPage = 8;
+    const voituresPerPage = 12;
 
     if (!user || user.seeStock !== 1) {
         return <div className="section">Accès refusé : vous n'avez pas la permission de voir les facutures.</div>;
@@ -37,6 +40,21 @@ export function Voiture() {
     }, []);
 
     const handleVoitureCreated = () => {
+        const res = fetch("http://localhost:3000/allVoiture", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()).then(data => setVoitures(data));
+    };
+
+    const handleEditClick = (voitureToEdit) => {
+        setSelectedVoiture(voitureToEdit);
+        setIsEditModalOpen(true);
+    };
+
+    const handleVoitureModified = () => {
         const res = fetch("http://localhost:3000/allVoiture", {
             method: "GET",
             headers: {
@@ -112,7 +130,7 @@ export function Voiture() {
                 <div className="section">
                     <div className="row columns is-multiline is-mobile">
                         {currentVoitures.map((voiture) => {
-                            return <AfficherVoiture key={voiture.id_voiture} voiture={voiture} />;
+                            return <AfficherVoiture key={voiture.id_voiture} voiture={voiture} onEditClick={handleEditClick} />;
                         })}
                     </div>
                 </div>
@@ -157,6 +175,12 @@ export function Voiture() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onVoitureCreated={handleVoitureCreated}
+            />
+            <ModifierVoiture
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                onVoitureModified={handleVoitureModified}
+                voiture={selectedVoiture}
             />
         </div>
     );

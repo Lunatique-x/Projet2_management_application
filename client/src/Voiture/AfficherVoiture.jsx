@@ -6,8 +6,7 @@ export function AfficherVoiture(props) {
         <div className="column is-3-desktop is-4-tablet is-6-mobile">
             <div
                 className="card has-text-black"
-                style={{ backgroundColor: "#f5f5f5", borderRadius: "5px" }}
-            >
+                style={{ backgroundColor: "#f5f5f5", borderRadius: "5px" }}>
                 <div className="card-content">
                     <div className="content">
                         <h3 className="title is-4 has-text-centered has-text-black">
@@ -27,6 +26,14 @@ export function AfficherVoiture(props) {
                         </div>
                     </div>
                 </div>
+                <footer className="card-footer">
+                    <button
+                        className="card-footer-item button is-info"
+                        onClick={() => onEditClick(voiture)}
+                    >
+                        Modifier / Supprimer
+                    </button>
+                </footer>
             </div>
         </div>
     );
