@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AfficherEmploye } from "./AfficherEmploye";
+import { CreeEmploye } from "./CreeEmploye";
 import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
 
@@ -8,6 +9,7 @@ export function Employe() {
     //useContexte
     const { user } = useContext(AuthContext);
     const [employes, setEmployes] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     if (!user || user.role_name !== "admin") {
         return (
@@ -21,23 +23,27 @@ export function Employe() {
     
 
     useEffect(() => {
-        async function getEmployes() {
-            const res = await fetch("http://localhost:3000/allEmploye", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem('token')}`,
-                    "Content-Type": "application/json"
-                }
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                setEmployes(data);
-            }
-        }
-
         getEmployes();
     }, []);
+
+    async function getEmployes() {
+        const res = await fetch("http://localhost:3000/allEmploye", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            setEmployes(data);
+        }
+    }
+
+    const handleEmployeCreated = () => {
+        getEmployes();
+    };
 
     return (
         <div className="section" style={{
@@ -78,6 +84,16 @@ export function Employe() {
             </div>
             <div className="container">
                 <div className="section">
+                    <div className="row">
+                        <button 
+                            className="button is-primary"
+                            onClick={() => setIsModalOpen(true)}
+                        >
+                            Ajouter un employé
+                        </button>
+                    </div>
+                </div>
+                <div className="section">
                     <div className="row columns is-multiline is-mobile">
                         {employes.map((employe) => {
                             return <AfficherEmploye key={employe.id_employe} employe={employe} />;
@@ -85,6 +101,12 @@ export function Employe() {
                     </div>
                 </div>
             </div>
+
+            <CreeEmploye 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)}
+                onEmployeCreated={handleEmployeCreated}
+            />
         </div>
     );
 }

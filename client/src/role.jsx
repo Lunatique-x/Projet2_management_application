@@ -1,12 +1,48 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useContext } from "react";
+import { Link } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
-
-
+import { AfficherRole } from "./Role/AfficherRole";
+import { CreeRole } from "./Role/CreeRole";
+import { ModifierRole } from "./Role/ModifierRole";
 
 export function Roles() { 
     //ajout du use contexte
     const { user } = useContext(AuthContext);
+    const [roles, setRoles] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedRole, setSelectedRole] = useState(null);
+
+    useEffect(() => {
+        getRole();
+    }, []);
+
+    async function getRole() {
+        const res = await fetch("http://localhost:3000/allRole", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                "Content-Type": "application/json"
+            }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            setRoles(data);
+        }
+    }
+
+    const handleRoleCreated = () => {
+        getRole();
+    };
+
+    const handleEditClick = (roleToEdit) => {
+        setSelectedRole(roleToEdit);
+        setIsEditModalOpen(true);
+    };
+
+    const handleRoleModified = () => {
+        getRole();
+    };
 
     if (!user || user.role_name !== "admin") {
         return (
@@ -55,6 +91,38 @@ export function Roles() {
 
                 </div>
             </div>
+            <div className="container">
+                <div className="section">
+                    <div className="row">
+                        <button 
+                            className="button is-primary"
+                            onClick={() => setIsModalOpen(true)}
+                        >
+                            Créer un rôle
+                        </button>
+                    </div>
+                </div>
+                <div className="section">
+                    <div className="row columns is-multiline is-mobile">
+                        {roles.map((role) => {
+                            return <AfficherRole key={role.id_role} role={role} onEditClick={handleEditClick} />;
+                        })}
+                    </div>
+                </div>
+            </div>
+
+            <CreeRole 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)}
+                onRoleCreated={handleRoleCreated}
+            />
+
+            <ModifierRole
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                onRoleModified={handleRoleModified}
+                role={selectedRole}
+            />
         </div>
     );
 }
