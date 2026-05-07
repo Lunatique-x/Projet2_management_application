@@ -22,14 +22,76 @@ if (!existsRole) {
     table.increments("id_role").primary();
 
     table.string("nom").notNullable();
-    table.boolean("seeStock").notNullable().defaultTo(false);
+    table.boolean("viewStock").notNullable().defaultTo(false);
     table.boolean("modStock").notNullable().defaultTo(false);
-    table.boolean("seeClients").notNullable().defaultTo(false);
+    table.boolean("viewClients").notNullable().defaultTo(false);
+    table.boolean("delClients").notNullable().defaultTo(false);
     table.boolean("modClients").notNullable().defaultTo(false);
-    table.boolean("modSell").notNullable().defaultTo(false);
+    table.boolean("viewSell").notNullable().defaultTo(false);
+    table.boolean("delSell").notNullable().defaultTo(false);
+    table.boolean("addSell").notNullable().defaultTo(false);
     table.boolean("addClient").notNullable().defaultTo(false);
-    
+    table.boolean("addStock").notNullable().defaultTo(false);
+    table.boolean("delStock").notNullable().defaultTo(false);
   });
+} else {
+  const roleTable = "role";
+
+  if (!(await db.schema.hasColumn(roleTable, 'viewStock'))) {
+    await db.schema.table(roleTable, (table) => {
+      table.boolean('viewStock').notNullable().defaultTo(false);
+    });
+  }
+
+  if (!(await db.schema.hasColumn(roleTable, 'viewClients'))) {
+    await db.schema.table(roleTable, (table) => {
+      table.boolean('viewClients').notNullable().defaultTo(false);
+    });
+  }
+
+  if (!(await db.schema.hasColumn(roleTable, 'delClients'))) {
+    await db.schema.table(roleTable, (table) => {
+      table.boolean('delClients').notNullable().defaultTo(false);
+    });
+  }
+
+  if (!(await db.schema.hasColumn(roleTable, 'viewSell'))) {
+    await db.schema.table(roleTable, (table) => {
+      table.boolean('viewSell').notNullable().defaultTo(false);
+    });
+  }
+
+  if (!(await db.schema.hasColumn(roleTable, 'delSell'))) {
+    await db.schema.table(roleTable, (table) => {
+      table.boolean('delSell').notNullable().defaultTo(false);
+    });
+  }
+
+  if (!(await db.schema.hasColumn(roleTable, 'addSell'))) {
+    await db.schema.table(roleTable, (table) => {
+      table.boolean('addSell').notNullable().defaultTo(false);
+    });
+  }
+
+  if (!(await db.schema.hasColumn(roleTable, 'addStock'))) {
+    await db.schema.table(roleTable, (table) => {
+      table.boolean('addStock').notNullable().defaultTo(false);
+    });
+  }
+
+  if (!(await db.schema.hasColumn(roleTable, 'delStock'))) {
+    await db.schema.table(roleTable, (table) => {
+      table.boolean('delStock').notNullable().defaultTo(false);
+    });
+  }
+
+  if ((await db.schema.hasColumn(roleTable, 'seeStock')) && (await db.schema.hasColumn(roleTable, 'viewStock'))) {
+    await db.raw('UPDATE role SET viewStock = seeStock');
+  }
+
+  if ((await db.schema.hasColumn(roleTable, 'seeClients')) && (await db.schema.hasColumn(roleTable, 'viewClients'))) {
+    await db.raw('UPDATE role SET viewClients = seeClients');
+  }
 }
 
   // ---- employe ----
@@ -111,14 +173,35 @@ async function seedAdminRoleAndUser() {
   if (!adminRole) {
     await db('role').insert({
       nom: adminRoleName,
-      seeStock: true,
+      viewStock: true,
       modStock: true,
-      seeClients: true,
+      viewClients: true,
+      delClients: true,
       modClients: true,
-      modSell: true,
-      addClient: true
+      viewSell: true,
+      delSell: true,
+      addSell: true,
+      addClient: true,
+      addStock: true,
+      delStock: true
     });
     adminRole = await db('role').where({ nom: adminRoleName }).first();
+  } else {
+    await db('role')
+      .where({ id_role: adminRole.id_role })
+      .update({
+        viewStock: true,
+        modStock: true,
+        viewClients: true,
+        delClients: true,
+        modClients: true,
+        viewSell: true,
+        delSell: true,
+        addSell: true,
+        addClient: true,
+        addStock: true,
+        delStock: true
+      });
   }
 
   let adminUser = await db('employe').where({ email: 'admin@gmail.com' }).first();
