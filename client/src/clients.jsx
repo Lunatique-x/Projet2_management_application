@@ -37,17 +37,13 @@ export function Clients() {
         }
     }
 
-    const handleClientCreated = () => {
+    const handleClient = () => {
         getClient();
     };
 
     const handleEditClick = (clientToEdit) => {
         setSelectedClient(clientToEdit);
         setIsEditModalOpen(true);
-    };
-
-    const handleClientModified = () => {
-        getClient();
     };
 
 
@@ -114,12 +110,12 @@ export function Clients() {
             <CreeClient 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)}
-                onClientCreated={handleClientCreated}
+                onClientCreated={handleClient}
             />
             <ModifierClient 
                 isOpen={isEditModalOpen} 
                 onClose={() => setIsEditModalOpen(false)}
-                onClientModified={handleClientModified}
+                onClientModified={handleClient}
                 client={selectedClient}
             />
         </div>

@@ -1,11 +1,12 @@
-export function AfficherFacture(props){
+export function AfficherFacture(props) {
     const facture = props.facture;
 
-return(
-<div className="column is-3-desktop is-4-tablet is-6-mobile">
+    return (
+        <div className="column is-3-desktop is-4-tablet is-6-mobile">
             <div
                 className="card has-text-black"
-                style={{ backgroundColor: '#f5f5f5', borderRadius: '5px' }}
+                style={{ backgroundColor: '#f5f5f5', borderRadius: '5px', cursor: 'pointer' }}
+                onClick={() => props.onEditClick(props.facture)}
             >
                 <div style={{ height: '5px', backgroundColor: '#000000', borderRadius: '5px 5px 0 0' }}></div>
 
@@ -20,19 +21,22 @@ return(
                             <span>{new Date(facture.date_creation).toLocaleDateString()}</span>
                         </div>
 
+                        {/* Affichage du nom complet du Client */}
                         <div className="mb-2">
-                            <span className="has-text-weight-bold"> Client ID : </span>
-                            <span>{facture.client_id}</span>
+                            <span className="has-text-weight-bold"> Client : </span>
+                            <span>{facture.client_nom || 'Inconnu'}</span>
                         </div>
 
+                        {/* Affichage du modèle de la voiture */}
                         <div className="mb-2">
-                            <span className="has-text-weight-bold"> Voiture ID : </span>
-                            <span>{facture.voiture_id}</span>
+                            <span className="has-text-weight-bold"> Voiture : </span>
+                            <span>{facture.voiture_modele || 'N/A'}</span>
                         </div>
 
+                        {/* Affichage du nom complet de l'Employé */}
                         <div className="mb-2">
-                            <span className="has-text-weight-bold"> Employé ID : </span>
-                            <span>{facture.employe_id ? facture.employe_id : 'N/A'}</span>
+                            <span className="has-text-weight-bold"> Vendu par : </span>
+                            <span>{facture.employe_nom || 'N/A'}</span>
                         </div>
 
                         <div className="notification is-warning is-light p-2 mt-3">

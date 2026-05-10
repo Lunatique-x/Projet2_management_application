@@ -77,34 +77,46 @@ app.post('/payement', async (req, res) => {
     const { client_id, voiture_id, employe_id, date_fin_garantie, prix_vente } = req.body;
 
     try {
-        // 1. Vérifier le client (colonne id_client)
-        const clientExists = await db('client').where({ id_client: client_id }).first();
-        if (!clientExists) {
-            return res.status(404).json({ message: "Le client spécifié n'existe pas" });
-        }
+        await db.transaction(async (trx) => {
+            // 1. Vérifier le client
+            const clientExists = await trx('client').where({ id_client: client_id }).first();
+            if (!clientExists) {
+                return res.status(404).json({ message: "Le client spécifié n'existe pas" });
+            }
 
-        // 2. Vérifier la voiture (colonne id_voiture)
-        const voitureExists = await db('voiture').where({ id_voiture: voiture_id }).first();
-        if (!voitureExists) {
-            return res.status(404).json({ message: "La voiture spécifiée n'existe pas" });
-        }
+            // 2. Vérifier la voiture ET son stock
+            const voiture = await trx('voiture').where({ id_voiture: voiture_id }).first();
+            if (!voiture) {
+                return res.status(404).json({ message: "La voiture spécifiée n'existe pas" });
+            }
+            
+            if (voiture.stock <= 0) {
+                return res.status(400).json({ message: "Rupture de stock pour ce modèle" });
+            }
 
-        // 3. Vérifier l'employé (colonne id_employe)
-        const employeExists = await db('employe').where({ id_employe: employe_id }).first();
-        if (!employeExists) {
-            return res.status(404).json({ message: "L'employé spécifié n'existe pas" });
-        }
+            // 3. Vérifier l'employé
+            const employeExists = await trx('employe').where({ id_employe: employe_id }).first();
+            if (!employeExists) {
+                return res.status(404).json({ message: "L'employé spécifié n'existe pas" });
+            }
 
-        // 4. Insertion (Assure-toi que les noms de colonnes dans la table 'payement' sont corrects)
-        const [id] = await db('payement').insert({
-            client_id,
-            voiture_id,
-            employe_id,
-            date_fin_garantie,
-            prix_vente
+            // 4. RÉDUIRE LE STOCK DE 1
+            await trx('voiture')
+                .where({ id_voiture: voiture_id })
+                .decrement('stock', 1);
+
+            // 5. Insertion de la facture
+            const [id] = await trx('payement').insert({
+                client_id,
+                voiture_id,
+                employe_id,
+                date_fin_garantie,
+                prix_vente,
+                date_creation: new Date().toISOString() // Optionnel si géré par défaut
+            });
+
+            res.json({ message: 'Payement créé avec succès et stock mis à jour', id });
         });
-
-        res.json({ message: 'Payement créé avec succès', id });
 
     } catch (err) {
         console.error(err);

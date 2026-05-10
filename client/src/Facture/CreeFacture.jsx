@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { fetchClients, fetchEmployees, fetchVoitures } from "../api";
 
 // 1. On crée la fonction utilitaire à l'extérieur (ou à l'intérieur)
     const getFirstMatch = (list, searchTerm) => {
@@ -12,10 +13,12 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
     const [formData, setFormData] = useState({
         client_name: "",
         client_id: null,
+        client_phone: "", // Ajouté
         employe_name: "",
         employe_id: null,
         voiture_modele: "",
         voiture_id: null,
+        voiture_couleur: "", // Ajouté
         prix_vente: 0
     });
 
@@ -24,11 +27,28 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
     const [allVoitures, setAllVoitures] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    const selectedVoiture = allVoitures.find(v => `${v.modele} (${v.couleur})` === formData.voiture_modele);
+    const selectedClient = allClients.find(c => c.full_name === formData.client_name);
+    const isOutOfStock = selectedVoiture && selectedVoiture.stock <= 0;
+
     useEffect(() => {
         if (isOpen) {
             getAllClients();
             getAllEmployees();
             getAllVoitures();
+
+            setFormData({
+                client_name: "",
+                client_id: null,
+                client_phone: "",
+                employe_name: "",
+                employe_id: null,
+                voiture_modele: "",
+                voiture_id: null,
+                voiture_couleur: "",
+                prix_vente: 0
+            });
+            console.log(allVoitures)
         }
     }, [isOpen]);
 
@@ -41,76 +61,37 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
     };
     
     const getAllClients = async () => {
-        try {
-            const res = await fetch("http://localhost:3000/allClient", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem('token')}`,
-                "Content-Type": "application/json"
-            }
-        });
-        if (res.ok) {
-            const data = await res.json();
-            setAllClients(data);
-        }
-        } catch (error) {
-            console.error("Erreur lors de la récupération des clients:", error);
-        }
+        const data = await fetchClients();
+        setAllClients(data);
     };
 
     const getAllEmployees = async () => {
-        try {
-            const res = await fetch("http://localhost:3000/allEmploye", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem('token')}`,
-                "Content-Type": "application/json"
-            }
-        });
-        if (res.ok) {
-            const data = await res.json();
-            setAllEmployes(data);
-        }
-        } catch (error) {
-            console.error("Erreur lors de la récupération des clients:", error);
-        }
+        const data = await fetchEmployees();
+        setAllEmployes(data);
     };
 
     const getAllVoitures = async () => {
-        try {
-            const res = await fetch("http://localhost:3000/allVoiture", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem('token')}`,
-                "Content-Type": "application/json"
-            }
-        });
-        if (res.ok) {
-            const data = await res.json();
-            setAllVoitures(data);
-        }
-        } catch (error) {
-            console.error("Erreur lors de la récupération des clients:", error);
-        }
+        const data = await fetchVoitures();
+        setAllVoitures(data);
     };
 
     const handleKeyDown = (e, fieldName, dataList) => {
         if (e.key === 'Enter') {
             const searchTerm = (formData[fieldName] || "").toLowerCase();
             
-            // On cherche le premier qui correspond à ce qui est écrit
             const match = dataList.find(item => 
                 (item.full_name || item.modele || "").toLowerCase().includes(searchTerm)
             );
 
             if (match) {
-                // Empêche la soumission du formulaire
                 e.preventDefault(); 
                 
-                // Remplit le champ avec le nom complet trouvé
+                // On met à jour le nom ET les infos supplémentaires (tel ou couleur)
                 setFormData(prev => ({
                     ...prev,
-                    [fieldName]: match.full_name || match.modele
+                    [fieldName]: match.full_name || match.modele,
+                    client_phone: match.phone ? match.phone : prev.client_phone,
+                    voiture_couleur: match.couleur ? match.couleur : prev.voiture_couleur
                 }));
             }
         }
@@ -118,36 +99,36 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // 1. On cherche les objets correspondants dans nos listes
+    
         const clientMatch = allClients.find(c => c.full_name === formData.client_name);
         const employeMatch = allEmployes.find(e => e.full_name === formData.employe_name);
-        const voitureMatch = allVoitures.find(v => v.modele === formData.voiture_modele);
+        const voitureMatch = allVoitures.find(v => `${v.modele} - ${v.couleur}` === formData.voiture_modele);
 
-        console.log("VOiture trouvée:", voitureMatch);
+        if (voitureMatch && voitureMatch.stock <= 0) {
+            alert("Impossible de vendre : ce véhicule est en rupture de stock.");
+            return;
+        }
 
-        // 2. Vérification : est-ce que les noms saisis existent vraiment ?
         if (!clientMatch || !employeMatch || !voitureMatch) {
-            alert("Erreur : Veuillez sélectionner des noms valides dans les listes suggérées.");
+            alert("Erreur : Veuillez sélectionner des éléments valides.");
             return;
         }
 
         setIsLoading(true);
 
-        // 3. On prépare le body avec les IDs et les dates
         const dateGarantie = new Date();
         dateGarantie.setFullYear(dateGarantie.getFullYear() + 1);
 
         const dataToSend = {
             date_creation: new Date().toISOString(),
             date_fin_garantie: dateGarantie.toISOString(),
-            prix_vente: voitureMatch.prix, // On prend le prix de la voiture trouvée
+            prix_vente: voitureMatch.prix,
             client_id: clientMatch.id_client,
             employe_id: employeMatch.id_employe,
             voiture_id: voitureMatch.id_voiture
+            // Note: Le téléphone et la couleur ne sont pas dans ta table 'payement' 
+            // d'après ton db.js, donc on ne les envoie pas, on les affiche juste.
         };
-
-        console.log("Données envoyées au backend:", dataToSend);
 
         try {
             const res = await fetch("http://localhost:3000/post/payement", {
@@ -162,14 +143,10 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
             if (res.ok) {
                 const data = await res.json();
                 onFactureCreated(data);
-                // Reset complet du formulaire
                 setFormData({
-                    client_name: "",
-                    client_id: null,
-                    employe_name: "",
-                    employe_id: null,
-                    voiture_modele: "",
-                    voiture_id: null,
+                    client_name: "", client_id: null, client_phone: "",
+                    employe_name: "", employe_id: null,
+                    voiture_modele: "", voiture_id: null, voiture_couleur: "",
                     prix_vente: 0
                 });
                 onClose();
@@ -196,26 +173,21 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
                             <div className="control">
                                 <input
                                     className="input"
-                                    type="text"
                                     name="client_name"
-                                    list="clients-list" // Lie l'input au datalist via l'ID
+                                    list="clients-list"
                                     value={formData.client_name}
                                     onChange={handleChange}
                                     onKeyDown={(e) => handleKeyDown(e, 'client_name', allClients)}
-                                    autoComplete="off"
                                     required
                                 />
                                 <datalist id="clients-list">
-                                    {allClients
-                                        .filter(client => 
-                                            client.full_name.toLowerCase().includes(formData.client_name.toLowerCase())
-                                        )
-                                        .slice(0, 3) // Garde seulement les 3 premiers résultats
-                                        .map((client) => (
-                                            <option key={client.id_client} value={client.full_name} />
-                                        ))
-                                    }
+                                    {allClients.map(c => (
+                                        <option key={c.id_client} value={c.full_name}>{c.phone}</option>
+                                    ))}
                                 </datalist>
+                                {selectedClient && (
+                                <p className="help is-info">Téléphone : {selectedClient.phone}</p>
+                                )}
                             </div>
                         </div>
 
@@ -251,26 +223,31 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
                             <label className="label">Modèle de la Voiture</label>
                             <div className="control">
                                 <input
-                                    className="input"
-                                    type="text"
+                                    className={`input ${isOutOfStock ? 'is-danger' : ''}`}
                                     name="voiture_modele"
                                     list="voitures-list"
                                     value={formData.voiture_modele}
                                     onChange={handleChange}
-                                    onKeyDown={(e) => handleKeyDown(e, 'voiture_modele', allVoitures)} // Appel avec le type 'voiture'
-                                    autoComplete="off"
                                     required
                                 />
                                 <datalist id="voitures-list">
-                                    {allVoitures
-                                        .filter(v => (v.modele).toLowerCase().includes(formData.voiture_modele.toLowerCase()))
-                                        .slice(0, 3)
-                                        .map((v) => (
-                                            <option key={v.id_voiture} value={v.modele} />
-                                        ))
-                                    }
+                                    {allVoitures.map(v => (
+                                        <option key={v.id_voiture} value={`${v.modele} (${v.couleur})`}>Stock: {v.stock} | {v.couleur}</option>
+                                    ))}
                                 </datalist>
                             </div>
+                            {selectedVoiture && (
+                                <div className="mt-2">
+                                    <p className="help is-info">Couleur : {selectedVoiture.couleur}</p>
+                                    {isOutOfStock ? (
+                                        <p className="help is-danger has-text-weight-bold">
+                                            ⚠️ Ce véhicule est en rupture de stock.
+                                        </p>
+                                    ) : (
+                                        <p className="help is-success">Stock disponible : {selectedVoiture.stock}</p>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </form>
                 </section>

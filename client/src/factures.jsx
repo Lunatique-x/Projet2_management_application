@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AfficherFacture } from "./Facture/AfficherFacture";
 import { useState, useEffect } from "react";
 import { CreeFacture } from "./Facture/CreeFacture";
+import { ModifierFacture } from "./Facture/ModifierSupprimerFacture";
 import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
 
@@ -12,6 +13,8 @@ export function Factures() {
     const { user } = useContext(AuthContext);
     const [factures, setFactures] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedFacture, setSelectedFacture] = useState(null);
 
 
     if (!user || user.modSell !== 1) {
@@ -39,8 +42,13 @@ export function Factures() {
         }
     }
 
-    const handleFactureCreated = () => {
+    const handleFacture = () => {
         getFactures();
+    };
+
+    const handleEditClick = (factureToEdit) => {
+        setSelectedFacture(factureToEdit);
+        setIsEditModalOpen(true);
     };
 
     return (
@@ -97,7 +105,7 @@ export function Factures() {
                 <div className="section">
                     <div className="row columns is-multiline is-mobile">
                         {factures.map((f) => {
-                            return <AfficherFacture key={f.id_payement} facture={f} />;
+                            return <AfficherFacture key={f.id_payement} facture={f} onEditClick={handleEditClick} />;
                         })}
                     </div>
                 </div>
@@ -105,8 +113,17 @@ export function Factures() {
             <CreeFacture 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)}
-                onFactureCreated={handleFactureCreated}
+                onFactureCreated={handleFacture}
             />
+            <ModifierFacture 
+                isOpen={isEditModalOpen} 
+                onClose={() => setIsEditModalOpen(false)}
+                // Vérifie que le nom de la prop dans ModifierFacture est bien 'onFactureModified' 
+                onFactureModified={handleFacture} 
+                // Correction ici : le nom de la prop doit être 'facture' (au singulier)
+                facture={selectedFacture} 
+            />
+
         </div>
     );
 }

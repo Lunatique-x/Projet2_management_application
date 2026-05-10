@@ -6,20 +6,34 @@ const port = 3000;
 const authentifier = require('./commun.js')
 
 //supprimer un Payment
-app.delete('/payment/:id', async (req, res) => {
+app.delete('/payement/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const result = await db('payement').where({ id_payement: id }).del();
-        if (result === 0) {
-            // Si 0 ligne supprimée, l'ID n'existe pas en base
-            return res.status(404).json({ 
-                message: "Erreur : Ce paiement n'existe pas ou a déjà été supprimé." 
+        await db.transaction(async (trx) => {
+            // 1. Trouver la facture pour savoir quelle voiture était vendue
+            const facture = await trx('payement').where({ id_payement: id }).first();
+
+            if (!facture) {
+                return res.status(404).json({ message: "Ce paiement n'existe pas." });
+            }
+
+            // 2. Rendre la voiture au stock (+1)
+            await trx('voiture')
+                .where({ id_voiture: facture.voiture_id })
+                .increment('stock', 1);
+
+            // 3. Supprimer la facture
+            const result = await trx('payement').where({ id_payement: id }).del();
+
+            res.json({ 
+                message: 'Paiement supprimé et voiture remise en stock avec succès', 
+                result 
             });
-        }
-        res.json({ message: 'Payment supprimé avec succès', result });
+        });
     } catch (err) {
-        res.status(500).json(err);
+        console.error(err);
+        res.status(500).json({ message: "Erreur lors de la suppression", error: err.message });
     }
 });
 // supprimer un Client

@@ -8,15 +8,28 @@ const authentifier = require('./commun')
 
 // On définit la route GET
 
-// Cette route permet de recuperer tout les factures
+// Cette route permet de récupérer toutes les factures avec les noms complets
 app.get('/allFactures', async (req, res) => {
-    console.log("Facture");
-    // 2. La requête à la base de données
+    console.log("Récupération des factures avec détails...");
     try {
-        const result = await db('payement').select('*');
+        const result = await db('payement')
+            // Jointure avec la table client
+            .join('client', 'payement.client_id', '=', 'client.id_client')
+            // Jointure avec la table voiture
+            .join('voiture', 'payement.voiture_id', '=', 'voiture.id_voiture')
+            // Jointure "left" avec employé (au cas où l'employé_id est null)
+            .leftJoin('employe', 'payement.employe_id', '=', 'employe.id_employe')
+            .select(
+                'payement.*',                 // Toutes les colonnes de la facture
+                'client.full_name as client_nom',   // Le nom du client
+                'voiture.modele as voiture_modele', // Le modèle de la voiture
+                'employe.full_name as employe_nom'  // Le nom de l'employé
+            );
+
         res.json(result);
     } catch (err) {
-        res.status(500).json(err);
+        console.error(err);
+        res.status(500).json({ error: "Erreur lors de la récupération des factures" });
     }
 });
 //Cette route permet de recuper une facture specifique selon id de la facture
