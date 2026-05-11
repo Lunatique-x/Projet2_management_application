@@ -12,10 +12,10 @@ const { db } = require('./db');//V2
 
 // Route qui permet de crée un utilisateur 
 app.post("/register", async (req, res) => {
-    const { full_name, email, password, phone, commission,role_id } = req.body;// ajout de role.id
+    const { full_name, email, password, phone, commission, role_id } = req.body;// ajout de role.id
 
     if (!req.body) {
-    return res.status(400).json({ message: "Le corps de la requête est vide" });
+        return res.status(400).json({ message: "Le corps de la requête est vide" });
     }
 
     // L'email et le password son obligatoire dans la création du compte
@@ -33,7 +33,7 @@ app.post("/register", async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Insérer en base
-        await db('employe').insert({ full_name, email, password: hashedPassword, phone, commission,role_id });//ajout de role_id
+        await db('employe').insert({ full_name, email, password: hashedPassword, phone, commission, role_id });//ajout de role_id
 
         // Réponse
         res.status(201).json({ message: "Compte créé avec succès" });
@@ -52,25 +52,30 @@ app.post("/token", async (req, res) => {
     }
     try {
         // const user = await db('employe').where('email', email).select('*').first();
-// modification de D lier au role
+        // modification de D lier au role
         const user = await db('employe')
-        .join('role', 'employe.role_id', 'role.id_role') // Jointure entre les deux tables
-        .where('employe.email', email)
-        .select(
-            'employe.id_employe', 
-            'employe.full_name', 
-            'employe.email', 
-            'employe.password', 
-            'role.nom as role_name', // On renomme pour éviter les conflits
-            'role.seeStock', 
-            'role.modStock', 
-            'role.seeClients', 
-            'role.modClients', 
-            'role.modSell', 
-            'role.addClient'
-        )
-        .first();
-//------------------
+            .join('role', 'employe.role_id', 'role.id_role') // Jointure entre les deux tables
+            .where('employe.email', email)
+            .select(
+                'employe.id_employe',
+                'employe.full_name',
+                'employe.email',
+                'employe.password',
+                'role.nom as role_name', // On renomme pour éviter les conflits
+                'role.viewStock',
+                'role.modStock',
+                'role.addStock',
+                'role.delStock',
+                'role.viewClients',
+                'role.addClient',
+                'role.modClients',
+                'role.delClients',
+                'role.viewSell',
+                'role.addSell',
+                'role.delSell'
+            )
+            .first();
+        //------------------
 
         if (!user) {
             return res.status(401).json({ message: "Utilisateur introuvable" });
@@ -91,22 +96,34 @@ app.post("/token", async (req, res) => {
 
         // Retourner le token
         //res.json({token: token });
-// modification D
+        // modification D
         res.json({
-        token: token,
-        user: {
-            id_employe: user.id_employe,
-            full_name: user.full_name,
-            role_name: user.role_name,
-            seeStock: user.seeStock,
-            modStock: user.modStock,
-            seeClients: user.seeClients,
-            modClients: user.modClients,
-            modSell: user.modSell,
-            addClient: user.addClient
-        }
-    });
-//-----------
+            token: token,
+            user: {
+                id_employe: user.id_employe,
+                full_name: user.full_name,
+                role_name: user.role_name,
+
+
+                // Permissions Stock
+                viewStock: user.viewStock, // Le !! force la valeur en true/false (booléen)
+                addStock: user.addStock,
+                modStock: user.modStock,
+                delStock: user.delStock,
+
+                // Permissions Clients
+                viewClients: user.viewClients,
+                addClient: user.addClient,
+                modClients: user.modClients,
+                delClients: user.delClients,
+
+                // Permissions Ventes (Sell)
+                viewSell: user.viewSell,
+                addSell: user.addSell,
+                delSell: user.delSel
+            }
+        });
+        //-----------
     } catch (error) {
         res.status(500).json({ message: "Erreur serveur" });
     }

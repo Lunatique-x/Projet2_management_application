@@ -16,7 +16,7 @@ export function Voiture() {
     const [currentPage, setCurrentPage] = useState(1);
     const voituresPerPage = 12;
 
-    if (!user || user.seeStock !== 1) {
+    if (!user || user.viewStock !== 1) {
         return <div className="section">Accès refusé : vous n'avez pas la permission de voir les facutures.</div>;
     }
 
@@ -88,7 +88,7 @@ export function Voiture() {
             <div className="card-box" style={{ maxWidth: '300px' }}>
                 <div className="box">
 
-                    {user.seeClients === 1 && (
+                    {user.viewClients === 1 && (
                         <Link to="/clients" className="link">
                             <div className="boite ">Clients</div>
                         </Link>
@@ -97,7 +97,7 @@ export function Voiture() {
                     <Link to="/voitures" className="siteactuel">
                         <div className="boite">Voitures</div>
                     </Link>
-                    {user.modSell === 1 && (
+                    {user.viewSell === 1 && (
                         <Link to="/factures" className="link">
                             <div className="boite">Factures</div>
                         </Link>

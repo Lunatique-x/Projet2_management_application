@@ -25,18 +25,18 @@ export function Home() {
         }}>
             <div className="card-box" style={{ maxWidth: '300px' }}>
                 <div className="box">
-                    {user.seeClients === 1 && (
+                    {user.viewClients === 1 && (
                         <Link to="/clients" className="link">
                             <div className="boite">Clients</div>
                         </Link>
                     )}
-                    {user.seeStock === 1 && (
+                    {user.viewStock === 1 && (
                         <Link to="/voitures" className="link">
                             <div className="boite">Voitures</div>
                         </Link>
                     )}
 
-                    {user.modSell === 1 && (
+                    {user.viewSell === 1 && (
                         <Link to="/factures" className="link">
                             <div className="boite">Factures</div>
                         </Link>

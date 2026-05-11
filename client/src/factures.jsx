@@ -17,7 +17,7 @@ export function Factures() {
     const [selectedFacture, setSelectedFacture] = useState(null);
 
 
-    if (!user || user.modSell !== 1) {
+    if (!user || user.viewSell !== 1) {
         return <div className="section">Accès refusé : vous n'avez pas la permission de voir les facutures.</div>;
     }
 
@@ -62,13 +62,13 @@ export function Factures() {
 
                 <div className="box">
 
-                    {user.seeClients === 1 && (
+                    {user.viewClients === 1 && (
                     <Link to="/clients" className="link">
                         <div className="boite ">Clients</div>
                     </Link>
                     )}
 
-                    {user.seeStock === 1 && (
+                    {user.viewStock === 1 && (
                     <Link to="/voitures" className="link">
                         <div className="boite">Voitures</div>
                     </Link>
