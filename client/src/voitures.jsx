@@ -135,8 +135,11 @@ export function Voiture() {
                     </div>
                 </div>
 
-                {totalPages > 1 && (
-                    <div className="section" style={{ display: 'flex', justifyContent: 'center' }}>
+                {totalPages > 0 && (
+                    <div className="section" style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                        <p className="has-text-weight-semibold">
+                            Page {currentPage} sur {totalPages}
+                        </p>
                         <nav className="pagination" role="navigation" aria-label="pagination">
                             <button
                                 className="pagination-previous"

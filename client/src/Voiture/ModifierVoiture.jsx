@@ -21,6 +21,10 @@ export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture })
         }
     }, [voiture, isOpen]);
 
+    if (!voiture) {
+        return null;
+    }
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -62,6 +66,12 @@ export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture })
 
     const handleSuppress = async (e) => {
         e.preventDefault();
+
+        const isConfirmed = window.confirm("Voulez-vous vraiment supprimer cette voiture ?");
+        if (!isConfirmed) {
+            return;
+        }
+
         setIsLoading(true);
 
         try {
