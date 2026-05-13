@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 
+import { useContext } from "react";
+import { AuthContext } from "../AuthContext";
+
 export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture }) {
+    const { user } = useContext(AuthContext);
     const [formData, setFormData] = useState({
         modele: "",
         couleur: "",
@@ -172,6 +176,7 @@ export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture })
                     >
                         Modifier
                     </button>
+                    {user.delStock === 1&&(
                     <button
                         className={`button is-danger ${isLoading ? 'is-loading' : ''}`}
                         onClick={handleSuppress}
@@ -179,6 +184,7 @@ export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture })
                     >
                         Supprimer
                     </button>
+                    )}
                 </footer>
             </div>
         </div>

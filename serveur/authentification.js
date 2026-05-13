@@ -120,7 +120,7 @@ app.post("/token", async (req, res) => {
                 // Permissions Ventes (Sell)
                 viewSell: user.viewSell,
                 addSell: user.addSell,
-                delSell: user.delSel
+                delSell: user.delSell
             }
         });
         //-----------

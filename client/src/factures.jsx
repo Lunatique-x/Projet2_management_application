@@ -47,6 +47,7 @@ export function Factures() {
     };
 
     const handleEditClick = (factureToEdit) => {
+        if (user?.modSell !== 1) return;
         setSelectedFacture(factureToEdit);
         setIsEditModalOpen(true);
     };

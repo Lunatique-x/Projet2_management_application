@@ -50,6 +50,7 @@ export function Voiture() {
     };
 
     const handleEditClick = (voitureToEdit) => {
+        if (user?.modStock !== 1) return;
         setSelectedVoiture(voitureToEdit);
         setIsEditModalOpen(true);
     };

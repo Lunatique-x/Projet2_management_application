@@ -20,7 +20,7 @@ export function Clients() {
         return <div className="section">Accès refusé : vous n'avez pas la permission de voir les clients.</div>;
     }
     const filteredClients = (client || []).filter((c) =>
-        c.nom && c.nom.toLowerCase().includes(recherche.toLowerCase())
+        c.full_name && c.full_name.toLowerCase().includes(recherche.toLowerCase())
     );
 
     useEffect(() => {
@@ -46,6 +46,7 @@ export function Clients() {
     };
 
     const handleEditClick = (clientToEdit) => {
+        if (user?.modClients !== 1) return;
         setSelectedClient(clientToEdit);
         setIsEditModalOpen(true);
     };

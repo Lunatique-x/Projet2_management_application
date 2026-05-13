@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
+import { useContext } from "react";
+import { AuthContext } from "../AuthContext";
 
 export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
+    const { user } = useContext(AuthContext);
     const [formData, setFormData] = useState({
         full_name: "",
         email: "",
@@ -141,6 +144,7 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                     >
                         Modifier
                     </button>
+                    {user.delClients === "1" && (
                     <button
                         className={`button is-danger ${isLoading ? 'is-loading' : ''}`}
                         onClick={handleSupress}
@@ -148,6 +152,7 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                     >
                         Supprimer
                     </button>
+                    )}
                 </footer>
             </div>
         </div>

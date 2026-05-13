@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 // Importation de toutes les fonctions nécessaires
+import { useContext } from "react";
+import { AuthContext } from "../AuthContext";
 import { 
     fetchClients, 
     fetchEmployees, 
@@ -9,6 +11,7 @@ import {
 } from "../api";
 
 export function ModifierFacture({ isOpen, onClose, onFactureModified, facture }) {
+    const { user } = useContext(AuthContext);
     const [formData, setFormData] = useState({
         client_name: "",
         employe_name: "",
@@ -163,7 +166,9 @@ export function ModifierFacture({ isOpen, onClose, onFactureModified, facture })
                 </section>
                 <footer className="modal-card-foot">
                     <button className={`button is-warning ${isLoading ? 'is-loading' : ''}`} onClick={handleUpdate} disabled={isOutOfStock || isLoading}>Modifier</button>
+                    {user.delSell === "1" && (
                     <button className={`button is-danger ${isLoading ? 'is-loading' : ''}`} onClick={handleSuppress} disabled={isLoading}>Supprimer</button>
+                    )}
                     <button className="button" type="button" onClick={onClose}>Annuler</button>
                 </footer>
             </div>
