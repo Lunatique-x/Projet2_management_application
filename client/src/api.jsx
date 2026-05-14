@@ -63,6 +63,20 @@ export const updateFacture = async (id, data) => {
     }
 };
 
+export const updateEmployee = async (id, data) => {
+    try {
+        const res = await fetch(`${API_URL}/put/employes/${id}`, {
+            method: "PUT",
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return res;
+    } catch (error) {
+        console.error("Erreur updateEmployee:", error);
+        return { ok: false };
+    }
+};
+
 // Fonction pour SUPPRIMER une facture
 export const deleteFacture = async (id) => {
     try {

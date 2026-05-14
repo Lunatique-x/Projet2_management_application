@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AfficherEmploye } from "./AfficherEmploye";
 import { CreeEmploye } from "./CreeEmploye";
+import { ModifierEmploye } from "./ModifierEmploye";
 import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
 
@@ -10,6 +11,8 @@ export function Employe() {
     const { user } = useContext(AuthContext);
     const [employes, setEmployes] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedEmploye, setSelectedEmploye] = useState(null);
 
     if (!user || user.role_name !== "admin") {
         return (
@@ -42,6 +45,15 @@ export function Employe() {
     }
 
     const handleEmployeCreated = () => {
+        getEmployes();
+    };
+
+    const handleEditClick = (employeToEdit) => {
+        setSelectedEmploye(employeToEdit);
+        setIsEditModalOpen(true);
+    };
+
+    const handleEmployeModified = () => {
         getEmployes();
     };
 
@@ -96,7 +108,7 @@ export function Employe() {
                 <div className="section">
                     <div className="row columns is-multiline is-mobile">
                         {employes.map((employe) => {
-                            return <AfficherEmploye key={employe.id_employe} employe={employe} />;
+                            return <AfficherEmploye key={employe.id_employe} employe={employe} onEditClick={handleEditClick} />;
                         })}
                     </div>
                 </div>
@@ -106,6 +118,12 @@ export function Employe() {
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)}
                 onEmployeCreated={handleEmployeCreated}
+            />
+            <ModifierEmploye
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                onEmployeModified={handleEmployeModified}
+                employe={selectedEmploye}
             />
         </div>
     );

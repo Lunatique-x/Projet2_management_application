@@ -5,7 +5,8 @@ export function AfficherEmploye(props) {
         <div className="column is-3-desktop is-4-tablet is-6-mobile">
             <div
                 className="card has-text-black"
-                style={{ backgroundColor: '#f5f5f5', borderRadius: '5px' }}
+                style={{ backgroundColor: '#f5f5f5', borderRadius: '5px', cursor: props.onEditClick ? 'pointer' : 'default' }}
+                onClick={() => props.onEditClick && props.onEditClick(employe)}
             >
                 <div className="card-content">
                     <div className="content">
