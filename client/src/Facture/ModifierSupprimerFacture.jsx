@@ -166,7 +166,7 @@ export function ModifierFacture({ isOpen, onClose, onFactureModified, facture })
                 </section>
                 <footer className="modal-card-foot">
                     <button className={`button is-warning ${isLoading ? 'is-loading' : ''}`} onClick={handleUpdate} disabled={isOutOfStock || isLoading}>Modifier</button>
-                    {user.delSell === "1" && (
+                    {user.delSell === 1 && (
                     <button className={`button is-danger ${isLoading ? 'is-loading' : ''}`} onClick={handleSuppress} disabled={isLoading}>Supprimer</button>
                     )}
                     <button className="button" type="button" onClick={onClose}>Annuler</button>
