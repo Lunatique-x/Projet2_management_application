@@ -223,25 +223,32 @@ async function seedAdminRoleAndUser() {
 }
 
 async function seedDefaultClientAndVoiture() {
-  const defaultClientName = 'Myriam';
-  const clientExists = await db('client').where({ full_name: defaultClientName }).first();
-  if (!clientExists) {
-    await db('client').insert({
-      full_name: defaultClientName,
-      email: 'myriam@example.com',
-      phone: '0000000000'
-    });
+  const defaultClients = [
+    { full_name: 'Myriam', email: 'myriam@example.com', phone: '555-0101' },
+    { full_name: 'Alexandre', email: 'alexandre@example.com', phone: '555-0202' },
+    { full_name: 'Robert', email: 'robert@example.com', phone: '555-0303' },
+    { full_name: 'Camille', email: 'camille@example.com', phone: '555-0404' }
+  ];
+
+  for (const client of defaultClients) {
+    const clientExists = await db('client').where({ full_name: client.full_name }).first();
+    if (!clientExists) {
+      await db('client').insert(client);
+    }
   }
 
-  const defaultVoitureModele = 'Toyota 2017';
-  const voitureExists = await db('voiture').where({ modele: defaultVoitureModele }).first();
-  if (!voitureExists) {
-    await db('voiture').insert({
-      modele: defaultVoitureModele,
-      stock: 1,
-      couleur: 'Blanc',
-      prix: 15000
-    });
+  const defaultVoitures = [
+    { modele: 'Toyota 2017', stock: 1, couleur: 'Blanc', prix: 15000 },
+    { modele: 'Honda 2022', stock: 2, couleur: 'Noir', prix: 22000 },
+    { modele: 'Bently 2023', stock: 1, couleur: 'Bleu', prix: 125000 },
+    { modele: 'Kia 2015', stock: 3, couleur: 'Gris', prix: 12000 }
+  ];
+
+  for (const voiture of defaultVoitures) {
+    const voitureExists = await db('voiture').where({ modele: voiture.modele }).first();
+    if (!voitureExists) {
+      await db('voiture').insert(voiture);
+    }
   }
 }
 
