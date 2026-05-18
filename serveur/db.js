@@ -139,6 +139,8 @@ if (!existsRole) {
     });
   }
 
+  await seedDefaultClientAndVoiture();
+
   // ---- payement ----
   const existsPayement = await db.schema.hasTable("payement");
   if (!existsPayement) {
@@ -216,6 +218,29 @@ async function seedAdminRoleAndUser() {
       phone: '0000000000',
       commission: 0,
       role_id: adminRole.id_role
+    });
+  }
+}
+
+async function seedDefaultClientAndVoiture() {
+  const defaultClientName = 'Myriam';
+  const clientExists = await db('client').where({ full_name: defaultClientName }).first();
+  if (!clientExists) {
+    await db('client').insert({
+      full_name: defaultClientName,
+      email: 'myriam@example.com',
+      phone: '0000000000'
+    });
+  }
+
+  const defaultVoitureModele = 'Toyota 2017';
+  const voitureExists = await db('voiture').where({ modele: defaultVoitureModele }).first();
+  if (!voitureExists) {
+    await db('voiture').insert({
+      modele: defaultVoitureModele,
+      stock: 1,
+      couleur: 'Blanc',
+      prix: 15000
     });
   }
 }
