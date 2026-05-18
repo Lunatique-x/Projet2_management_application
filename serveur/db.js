@@ -29,6 +29,7 @@ if (!existsRole) {
     table.boolean("modClients").notNullable().defaultTo(false);
     table.boolean("viewSell").notNullable().defaultTo(false);
     table.boolean("delSell").notNullable().defaultTo(false);
+    table.boolean("modSell").notNullable().defaultTo(false);
     table.boolean("addSell").notNullable().defaultTo(false);
     table.boolean("addClient").notNullable().defaultTo(false);
     table.boolean("addStock").notNullable().defaultTo(false);
@@ -64,6 +65,12 @@ if (!existsRole) {
   if (!(await db.schema.hasColumn(roleTable, 'delSell'))) {
     await db.schema.table(roleTable, (table) => {
       table.boolean('delSell').notNullable().defaultTo(false);
+    });
+  }
+
+  if (!(await db.schema.hasColumn(roleTable, 'modSell'))) {
+    await db.schema.table(roleTable, (table) => {
+      table.boolean('modSell').notNullable().defaultTo(false);
     });
   }
 
@@ -182,6 +189,7 @@ async function seedAdminRoleAndUser() {
       modClients: true,
       viewSell: true,
       delSell: true,
+      modSell: true,
       addSell: true,
       addClient: true,
       addStock: true,
@@ -199,6 +207,7 @@ async function seedAdminRoleAndUser() {
         modClients: true,
         viewSell: true,
         delSell: true,
+        modSell: true,
         addSell: true,
         addClient: true,
         addStock: true,
