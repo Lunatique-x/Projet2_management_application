@@ -72,6 +72,7 @@ app.post("/token", async (req, res) => {
                 'role.delClients',
                 'role.viewSell',
                 'role.addSell',
+                'role.modSell',
                 'role.delSell'
             )
             .first();
@@ -120,6 +121,7 @@ app.post("/token", async (req, res) => {
                 // Permissions Ventes (Sell)
                 viewSell: user.viewSell,
                 addSell: user.addSell,
+                modSell: user.modSell,
                 delSell: user.delSell
             }
         });
