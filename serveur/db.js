@@ -227,7 +227,11 @@ async function seedDefaultClientAndVoiture() {
     { full_name: 'Myriam', email: 'myriam@example.com', phone: '555-010-1010' },
     { full_name: 'Alexandre', email: 'alexandre@example.com', phone: '555-020-2020' },
     { full_name: 'Robert', email: 'robert@example.com', phone: '555-030-3030' },
-    { full_name: 'Camille', email: 'camille@example.com', phone: '555-040-4040' }
+    { full_name: 'Camille', email: 'camille@example.com', phone: '555-040-4040' },
+    { full_name: 'Arthur', email: 'arthur@example.com', phone: '555-050-5050' },
+    { full_name: 'Ashley', email: 'ashley@example.com', phone: '555-060-6060' },
+    { full_name: 'Nicole', email: 'nicole@example.com', phone: '555-070-7070' },
+    { full_name: 'Rollande', email: 'rollande@example.com', phone: '555-080-8080' }
   ];
 
   for (const client of defaultClients) {
@@ -241,7 +245,11 @@ async function seedDefaultClientAndVoiture() {
     { modele: 'Toyota 2017', stock: 1, couleur: 'Blanc', prix: 15000 },
     { modele: 'Honda 2022', stock: 2, couleur: 'Noir', prix: 22000 },
     { modele: 'Bently 2023', stock: 1, couleur: 'Bleu', prix: 125000 },
-    { modele: 'Kia 2015', stock: 3, couleur: 'Gris', prix: 12000 }
+    { modele: 'Kia 2015', stock: 3, couleur: 'Gris', prix: 12000 },
+    { modele: 'Limousine', stock: 1, couleur: 'Noir', prix: 45000 },
+    { modele: 'Lamborghini 2027', stock: 1, couleur: 'Orange', prix: 450000 },
+    { modele: 'Bugatti 2020', stock: 1, couleur: 'Bleu', prix: 300000 },
+    { modele: 'Kia 2020', stock: 2, couleur: 'Blanc', prix: 18000 }
   ];
 
   for (const voiture of defaultVoitures) {
