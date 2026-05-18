@@ -42,7 +42,7 @@ export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture })
         setIsLoading(true);
 
         try {
-            const res = await fetch(`http://localhost:3000/put/voiture/${voiture.id_voiture}`, {
+            const res = await fetch(`http://localhost:3000/put/voitures/${voiture.id_voiture}`, {
                 method: "PUT",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`,

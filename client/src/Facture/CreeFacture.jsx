@@ -1,24 +1,16 @@
 import { useState, useEffect } from "react";
 import { fetchClients, fetchEmployees, fetchVoitures } from "../api";
 
-// 1. On crée la fonction utilitaire à l'extérieur (ou à l'intérieur)
-    const getFirstMatch = (list, searchTerm) => {
-        if (!searchTerm) return null;
-        return list.find(item => 
-            item.full_name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    };
-
 export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
     const [formData, setFormData] = useState({
         client_name: "",
         client_id: null,
-        client_phone: "", // Ajouté
+        client_phone: "",
         employe_name: "",
         employe_id: null,
         voiture_modele: "",
         voiture_id: null,
-        voiture_couleur: "", // Ajouté
+        voiture_couleur: "",
         prix_vente: 0
     });
 
@@ -27,90 +19,121 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
     const [allVoitures, setAllVoitures] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const selectedVoiture = allVoitures.find(v => `${v.modele} (${v.couleur})` === formData.voiture_modele);
-    const selectedClient = allClients.find(c => c.full_name === formData.client_name);
-    const isOutOfStock = selectedVoiture && selectedVoiture.stock <= 0;
-
+    // Reset du formulaire à l'ouverture
     useEffect(() => {
-        if (isOpen) {
-            getAllClients();
-            getAllEmployees();
-            getAllVoitures();
+        const loadData = async () => {
+            const [clients, employees, voitures] = await Promise.all([
+                fetchClients(),
+                fetchEmployees(),
+                fetchVoitures()
+            ]);
+            setAllClients(clients);
+            setAllEmployes(employees);
+            setAllVoitures(voitures);
+        };
+        
+        loadData();
 
+        if (isOpen) {
             setFormData({
-                client_name: "",
-                client_id: null,
-                client_phone: "",
-                employe_name: "",
-                employe_id: null,
-                voiture_modele: "",
-                voiture_id: null,
-                voiture_couleur: "",
+                client_name: "", client_id: null, client_phone: "",
+                employe_name: "", employe_id: null,
+                voiture_modele: "", voiture_id: null, voiture_couleur: "",
                 prix_vente: 0
             });
-            console.log(allVoitures)
         }
     }, [isOpen]);
 
+    // Détection automatique lors de la saisie ou sélection dans le datalist
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-    
-    const getAllClients = async () => {
-        const data = await fetchClients();
-        setAllClients(data);
+        
+        setFormData(prev => {
+            const updated = { ...prev, [name]: value };
+
+            // 1. Liaison automatique Client
+            if (name === "client_name") {
+                const match = allClients.find(c => c.full_name === value);
+                updated.client_id = match ? match.id_client : null;
+                updated.client_phone = match ? match.phone : "";
+            }
+
+            // 2. Liaison automatique Employé
+            if (name === "employe_name") {
+                const match = allEmployes.find(e => e.full_name === value);
+                updated.employe_id = match ? match.id_employe : null;
+            }
+
+            // 3. Liaison automatique Voiture
+            if (name === "voiture_modele") {
+                // Correspondance basée sur la valeur affichée dans l'option du datalist
+                const match = allVoitures.find(v => `${v.modele} - ${v.couleur}` === value);
+                updated.voiture_id = match ? match.id_voiture : null;
+                updated.voiture_couleur = match ? match.couleur : "";
+                updated.prix_vente = match ? match.prix : 0;
+            }
+
+            return updated;
+        });
     };
 
-    const getAllEmployees = async () => {
-        const data = await fetchEmployees();
-        setAllEmployes(data);
-    };
-
-    const getAllVoitures = async () => {
-        const data = await fetchVoitures();
-        setAllVoitures(data);
-    };
-
+    // Gestion de la recherche par autocomplétion avec la touche "Entrée"
     const handleKeyDown = (e, fieldName, dataList) => {
         if (e.key === 'Enter') {
             const searchTerm = (formData[fieldName] || "").toLowerCase();
             
-            const match = dataList.find(item => 
-                (item.full_name || item.modele || "").toLowerCase().includes(searchTerm)
-            );
+            const match = dataList.find(item => {
+                const textToSearch = item.full_name || item.modele || "";
+                return textToSearch.toLowerCase().includes(searchTerm);
+            });
 
             if (match) {
                 e.preventDefault(); 
                 
-                // On met à jour le nom ET les infos supplémentaires (tel ou couleur)
-                setFormData(prev => ({
-                    ...prev,
-                    [fieldName]: match.full_name || match.modele,
-                    client_phone: match.phone ? match.phone : prev.client_phone,
-                    voiture_couleur: match.couleur ? match.couleur : prev.voiture_couleur
-                }));
+                setFormData(prev => {
+                    if (fieldName === 'client_name') {
+                        return {
+                            ...prev,
+                            client_name: match.full_name,
+                            client_id: match.id_client,
+                            client_phone: match.phone
+                        };
+                    }
+                    if (fieldName === 'employe_name') {
+                        return {
+                            ...prev,
+                            employe_name: match.full_name,
+                            employe_id: match.id_employe
+                        };
+                    }
+                    if (fieldName === 'voiture_modele') {
+                        return {
+                            ...prev,
+                            voiture_modele: `${match.modele} - ${match.couleur}`,
+                            voiture_id: match.id_voiture,
+                            voiture_couleur: match.couleur,
+                            prix_vente: match.prix
+                        };
+                    }
+                    return prev;
+                });
             }
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
-        const clientMatch = allClients.find(c => c.full_name === formData.client_name);
-        const employeMatch = allEmployes.find(e => e.full_name === formData.employe_name);
-        const voitureMatch = allVoitures.find(v => `${v.modele} - ${v.couleur}` === formData.voiture_modele);
 
-        if (voitureMatch && voitureMatch.stock <= 0) {
-            alert("Impossible de vendre : ce véhicule est en rupture de stock.");
+        // Plus besoin de chercher les correspondances ici, tout est déjà dans formData !
+        if (!formData.client_id || !formData.employe_id || !formData.voiture_id) {
+            alert("Erreur : Veuillez sélectionner des éléments valides dans les listes.");
             return;
         }
 
-        if (!clientMatch || !employeMatch || !voitureMatch) {
-            alert("Erreur : Veuillez sélectionner des éléments valides.");
+        // Vérification du stock via l'ID trouvé
+        const voitureSelectionnee = allVoitures.find(v => v.id_voiture === formData.voiture_id);
+        if (voitureSelectionnee && voitureSelectionnee.stock <= 0) {
+            alert("Impossible de vendre : ce véhicule est en rupture de stock.");
             return;
         }
 
@@ -122,12 +145,10 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
         const dataToSend = {
             date_creation: new Date().toISOString(),
             date_fin_garantie: dateGarantie.toISOString(),
-            prix_vente: voitureMatch.prix,
-            client_id: clientMatch.id_client,
-            employe_id: employeMatch.id_employe,
-            voiture_id: voitureMatch.id_voiture
-            // Note: Le téléphone et la couleur ne sont pas dans ta table 'payement' 
-            // d'après ton db.js, donc on ne les envoie pas, on les affiche juste.
+            prix_vente: formData.prix_vente,
+            client_id: formData.client_id,
+            employe_id: formData.employe_id,
+            voiture_id: formData.voiture_id
         };
 
         try {
@@ -143,12 +164,6 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
             if (res.ok) {
                 const data = await res.json();
                 onFactureCreated(data);
-                setFormData({
-                    client_name: "", client_id: null, client_phone: "",
-                    employe_name: "", employe_id: null,
-                    voiture_modele: "", voiture_id: null, voiture_couleur: "",
-                    prix_vente: 0
-                });
                 onClose();
             }
         } catch (error) {
@@ -164,10 +179,12 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
             <div className="modal-card">
                 <header className="modal-card-head">
                     <p className="modal-card-title">Créer une nouvelle Facture</p>
-                    <button className="delete" onClick={onClose}></button>
+                    <button className="delete" onClick={onClose} type="button"></button>
                 </header>
                 <section className="modal-card-body">
                     <form onSubmit={handleSubmit}>
+                        
+                        {/* CHAMP : CLIENT */}
                         <div className="field">
                             <label className="label">Nom du client</label>
                             <div className="control">
@@ -178,6 +195,7 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
                                     value={formData.client_name}
                                     onChange={handleChange}
                                     onKeyDown={(e) => handleKeyDown(e, 'client_name', allClients)}
+                                    autoComplete="off"
                                     required
                                 />
                                 <datalist id="clients-list">
@@ -185,20 +203,21 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
                                         <option key={c.id_client} value={c.full_name}>{c.phone}</option>
                                     ))}
                                 </datalist>
-                                {selectedClient && (
-                                <p className="help is-info">Téléphone : {selectedClient.phone}</p>
+                                {formData.client_phone && (
+                                    <p className="help is-info">Téléphone lié : {formData.client_phone}</p>
                                 )}
                             </div>
                         </div>
 
+                        {/* CHAMP : EMPLOYÉ */}
                         <div className="field">
-                            <label className="label">Nom de l'employée</label>
+                            <label className="label">Nom de l'employé(e)</label>
                             <div className="control">
                                 <input
                                     className="input"
                                     type="text"
                                     name="employe_name"
-                                    list="employes-list" // Lie l'input au datalist via l'ID
+                                    list="employes-list"
                                     value={formData.employe_name}
                                     onChange={handleChange}
                                     onKeyDown={(e) => handleKeyDown(e, 'employe_name', allEmployes)}
@@ -206,61 +225,64 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
                                     required
                                 />
                                 <datalist id="employes-list">
-                                    {allEmployes
-                                        .filter(employe => 
-                                            employe.full_name.toLowerCase().includes(formData.employe_name.toLowerCase())
-                                        )
-                                        .slice(0, 3) // Garde seulement les 3 premiers résultats
-                                        .map((employe) => (
-                                            <option key={employe.id_employe} value={employe.full_name} />
-                                        ))
-                                    }
+                                    {allEmployes.map(e => (
+                                        <option key={e.id_employe} value={e.full_name} />
+                                    ))}
                                 </datalist>
                             </div>
                         </div>
 
+                        {/* CHAMP : VOITURE */}
                         <div className="field">
-                            <label className="label">Modèle de la Voiture</label>
+                            <label className="label">Modèle de Voiture</label>
                             <div className="control">
                                 <input
-                                    className={`input ${isOutOfStock ? 'is-danger' : ''}`}
+                                    className="input"
+                                    type="text"
                                     name="voiture_modele"
                                     list="voitures-list"
                                     value={formData.voiture_modele}
                                     onChange={handleChange}
+                                    onKeyDown={(e) => handleKeyDown(e, 'voiture_modele', allVoitures)}
+                                    autoComplete="off"
                                     required
                                 />
                                 <datalist id="voitures-list">
                                     {allVoitures.map(v => (
-                                        <option key={v.id_voiture} value={`${v.modele} (${v.couleur})`}>Stock: {v.stock} | {v.couleur}</option>
+                                        <option key={v.id_voiture} value={`${v.modele} - ${v.couleur}`}>
+                                            Stock: {v.stock} - {v.prix}$
+                                        </option>
                                     ))}
                                 </datalist>
+                                {formData.voiture_couleur && (
+                                    <p className="help is-success">Couleur: {formData.voiture_couleur} | Prix: {formData.prix_vente}$</p>
+                                )}
                             </div>
-                            {selectedVoiture && (
-                                <div className="mt-2">
-                                    <p className="help is-info">Couleur : {selectedVoiture.couleur}</p>
-                                    {isOutOfStock ? (
-                                        <p className="help is-danger has-text-weight-bold">
-                                            ⚠️ Ce véhicule est en rupture de stock.
-                                        </p>
-                                    ) : (
-                                        <p className="help is-success">Stock disponible : {selectedVoiture.stock}</p>
-                                    )}
-                                </div>
-                            )}
+                        </div>
+
+                        <div className="field is-grouped is-grouped mt-5">
+                            <div className="control">
+                                <button 
+                                    className={`button is-primary ${isLoading ? 'is-loading' : ''}`} 
+                                    type="submit"
+                                    disabled={isLoading}
+                                >
+                                    Créer la facture
+                                </button>
+                            </div>
+                            <div className="control">
+                                <button 
+                                    className="button is-white" 
+                                    type="button" 
+                                    onClick={onClose}
+                                    disabled={isLoading}
+                                >
+                                    Annuler
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </section>
-                <footer className="modal-card-foot">
-                    <button className="button" onClick={onClose}>Annuler</button>
-                    <button
-                        className={`button is-success ${isLoading ? 'is-loading' : ''}`}
-                        onClick={handleSubmit}
-                        disabled={isLoading}
-                    >
-                        Créer
-                    </button>
-                </footer>
             </div>
         </div>
     );

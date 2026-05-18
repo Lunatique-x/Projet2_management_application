@@ -183,7 +183,7 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                 </section>
                 <footer className="modal-card-foot">
                     <button className={`button is-success ${isLoading ? 'is-loading' : ''}`} onClick={handleSubmit} disabled={isLoading}>Modifier</button>
-                    {user.delClients === "1" && (
+                    {user.delClients  === 1 && (
                         <button className={`button is-danger ${isLoading ? 'is-loading' : ''}`} onClick={handleSupress} disabled={isLoading}>Supprimer</button>
                     )}
                     <button type="button" className="button is-light" onClick={onClose}>Annuler</button>
