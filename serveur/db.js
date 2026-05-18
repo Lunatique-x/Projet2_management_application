@@ -224,10 +224,10 @@ async function seedAdminRoleAndUser() {
 
 async function seedDefaultClientAndVoiture() {
   const defaultClients = [
-    { full_name: 'Myriam', email: 'myriam@example.com', phone: '555-0101' },
-    { full_name: 'Alexandre', email: 'alexandre@example.com', phone: '555-0202' },
-    { full_name: 'Robert', email: 'robert@example.com', phone: '555-0303' },
-    { full_name: 'Camille', email: 'camille@example.com', phone: '555-0404' }
+    { full_name: 'Myriam', email: 'myriam@example.com', phone: '555-010-1010' },
+    { full_name: 'Alexandre', email: 'alexandre@example.com', phone: '555-020-2020' },
+    { full_name: 'Robert', email: 'robert@example.com', phone: '555-030-3030' },
+    { full_name: 'Camille', email: 'camille@example.com', phone: '555-040-4040' }
   ];
 
   for (const client of defaultClients) {
