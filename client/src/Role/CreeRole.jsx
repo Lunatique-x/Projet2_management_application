@@ -1,180 +1,146 @@
 import { useState } from "react";
 
 export function CreeRole({ isOpen, onClose, onRoleCreated }) {
-    const [formData, setFormData] = useState({
-        nom: "",
-        seeStock: false,
-        seeClients: false,
-        modStock: false,
-        modClients: false,
-        modSell: false,
-        addClient: false
-    });
+  // 1. Initialisation incluant désormais delSell
+  const initialFormState = {
+    nom: "",
+    viewStock: false,
+    modStock: false,
+    viewClients: false,
+    delClients: false,
+    modClients: false,
+    viewSell: false,
+    addSell: false,
+    addClient: false,
+    addStock: false,
+    delStock: false,
+    modSell: false,
+    delSell: false // <- Ajouté selon votre nouvelle route
+  };
 
-    const [isLoading, setIsLoading] = useState(false);
+  // 2. Dictionnaire mis à jour avec la traduction pour delSell
+  const labelMapping = {
+    viewStock: "Voir le Stock",
+    modStock: "Modifier le Stock",
+    addStock: "Ajouter au Stock",
+    delStock: "Supprimer du Stock",
+    viewClients: "Voir les Clients",
+    modClients: "Modifier les Clients",
+    addClient: "Ajouter un Client",
+    delClients: "Supprimer les Clients",
+    viewSell: "Voir les Ventes",
+    addSell: "Ajouter une Vente",
+    modSell: "Modifier une Vente",
+    delSell: "Supprimer une Vente" // <- Ajouté selon votre nouvelle route
+  };
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-    };
+  const [formData, setFormData] = useState(initialFormState);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
 
-        try {
-            const res = await fetch("http://localhost:3000/role", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem('token')}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(formData)
-            });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMsg("");
 
-            if (res.ok) {
-                const data = await res.json();
-                onRoleCreated(data);
-                setFormData({
-                    nom: "",
-                    seeStock: false,
-                    seeClients: false,
-                    modStock: false,
-                    modClients: false,
-                    modSell: false,
-                    addClient: false
-                });
-                onClose();
-            }
-        } catch (error) {
-            console.error("Erreur:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    try {
+      const res = await fetch("http://localhost:3000/post/role", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('token')}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
 
-    return (
-        <div className={`modal ${isOpen ? 'is-active' : ''}`}>
-            <div className="modal-background" onClick={onClose}></div>
-            <div className="modal-card">
-                <header className="modal-card-head">
-                    <p className="modal-card-title">Créer un nouveau rôle</p>
-                    <button className="delete" onClick={onClose}></button>
-                </header>
-                <section className="modal-card-body">
-                    <form onSubmit={handleSubmit}>
-                        <div className="field">
-                            <label className="label">Nom du rôle</label>
-                            <div className="control">
-                                <input
-                                    className="input"
-                                    type="text"
-                                    name="nom"
-                                    value={formData.nom}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
+      if (res.ok) {
+        const data = await res.json();
+        onRoleCreated(data);
+        setFormData(initialFormState);
+        onClose();
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        setErrorMsg(errorData.message || `Erreur serveur: ${res.status}`);
+      }
+    } catch (error) {
+      console.error("Erreur:", error);
+      setErrorMsg("Impossible de contacter le serveur.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-                        <div className="field">
-                            <label className="checkbox">
-                                <input
-                                    type="checkbox"
-                                    name="seeStock"
-                                    checked={formData.seeStock}
-                                    onChange={handleChange}
-                                />
-                                {' '}Voir Stock
-                            </label>
-                        </div>
+  return (
+    <div className={`modal ${isOpen ? 'is-active' : ''}`}>
+      <div className="modal-background" onClick={onClose}></div>
+      <div className="modal-card">
+        <header className="modal-card-head">
+          <p className="modal-card-title">Créer un nouveau rôle</p>
+          <button className="delete" type="button" onClick={onClose} aria-label="close"></button>
+        </header>
+        
+        <form onSubmit={handleSubmit}>
+          <section className="modal-card-body">
+            {errorMsg && (
+              <div className="notification is-danger is-light">{errorMsg}</div>
+            )}
 
-                        <div className="field">
-                            <label className="checkbox">
-                                <input
-                                    type="checkbox"
-                                    name="seeClients"
-                                    checked={formData.seeClients}
-                                    onChange={handleChange}
-                                />
-                                {' '}Voir Clients
-                            </label>
-                        </div>
-
-                        <div className="field">
-                            <label className="checkbox">
-                                <input
-                                    type="checkbox"
-                                    name="modStock"
-                                    checked={formData.modStock}
-                                    onChange={handleChange}
-                                />
-                                {' '}Modifier Stock
-                            </label>
-                        </div>
-
-                        <div className="field">
-                            <label className="checkbox">
-                                <input
-                                    type="checkbox"
-                                    name="modClients"
-                                    checked={formData.modClients}
-                                    onChange={handleChange}
-                                />
-                                {' '}Modifier Clients
-                            </label>
-                        </div>
-
-                        <div className="field">
-                            <label className="checkbox">
-                                <input
-                                    type="checkbox"
-                                    name="modSell"
-                                    checked={formData.modSell}
-                                    onChange={handleChange}
-                                />
-                                {' '}Modifier Vente
-                            </label>
-                        </div>
-
-                        <div className="field">
-                            <label className="checkbox">
-                                <input
-                                    type="checkbox"
-                                    name="addClient"
-                                    checked={formData.addClient}
-                                    onChange={handleChange}
-                                />
-                                {' '}Ajouter Client
-                            </label>
-                        </div>
-
-                        <div className="field is-grouped">
-                            <div className="control">
-                                <button 
-                                    type="submit" 
-                                    className="button is-primary"
-                                    disabled={isLoading}
-                                >
-                                    {isLoading ? 'Création en cours...' : 'Créer'}
-                                </button>
-                            </div>
-                            <div className="control">
-                                <button 
-                                    type="button" 
-                                    className="button is-light"
-                                    onClick={onClose}
-                                >
-                                    Annuler
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </section>
+            <div className="field">
+              <label className="label">Nom du rôle</label>
+              <div className="control">
+                <input 
+                  className="input" 
+                  type="text" 
+                  name="nom" 
+                  value={formData.nom} 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
             </div>
-        </div>
-    );
+
+            <hr />
+            <label className="label">Permissions du rôle</label>
+
+            <div className="columns is-multiline">
+              {Object.keys(labelMapping).map((field) => (
+                <div className="column is-6" key={field}>
+                  <div className="field">
+                    <label className="checkbox">
+                      <input 
+                        type="checkbox" 
+                        name={field} 
+                        checked={formData[field]} 
+                        onChange={handleChange} 
+                      />
+                      {' '}{labelMapping[field]}
+                    </label>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <footer className="modal-card-foot">
+            <div className="buttons">
+              <button type="submit" className={`button is-primary ${isLoading ? 'is-loading' : ''}`} disabled={isLoading}>
+                Créer
+              </button>
+              <button type="button" className="button" onClick={onClose} disabled={isLoading}>
+                Annuler
+              </button>
+            </div>
+          </footer>
+        </form>
+      </div>
+    </div>
+  );
 }

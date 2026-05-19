@@ -4,14 +4,23 @@ import { AuthContext } from "./AuthContext";
 import { AfficherRole } from "./Role/AfficherRole";
 import { CreeRole } from "./Role/CreeRole";
 import { ModifierRole } from "./Role/ModifierRole";
+import { Pagination } from "./assets/Pagination";
+import { Filter } from "./assets/Filtre"; // Import de votre composant Filter
 
 export function Roles() { 
-    //ajout du use contexte
+    // ajout du use contexte
     const { user } = useContext(AuthContext);
     const [roles, setRoles] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedRole, setSelectedRole] = useState(null);
+
+    // État pour la recherche
+    const [recherche, setRecherche] = useState("");
+
+    // États pour la pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const [showsPerPage, setShowsPerPage] = useState(8);
 
     useEffect(() => {
         getRole();
@@ -44,6 +53,12 @@ export function Roles() {
         getRole();
     };
 
+    // Gestion du changement de texte dans la recherche
+    const handleRechercheChange = (e) => {
+        setRecherche(e.target.value);
+        setCurrentPage(1); // Force le retour à la première page lors de la saisie
+    };
+
     if (!user || user.role_name !== "admin") {
         return (
             <div className="section">
@@ -53,7 +68,22 @@ export function Roles() {
             </div>
         );
     }
-     return (
+
+    // Logique de filtrage par nom de rôle
+    const rolesFiltrés = roles.filter((r) => {
+        const terme = recherche.toLowerCase();
+        const nomRole = r.nom ? r.nom.toLowerCase() : "";
+        return nomRole.includes(terme);
+    });
+
+    // Logique de calcul de la pagination sur le tableau filtré
+    const indexOfLastShow = currentPage * showsPerPage;
+    const indexOfFirstShow = indexOfLastShow - showsPerPage;
+    const currentRoles = rolesFiltrés.slice(indexOfFirstShow, indexOfLastShow);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    return (
         <div className="section" style={{
             display: 'flex',
             justifyContent: 'flex-start',
@@ -61,10 +91,7 @@ export function Roles() {
             marginLeft: '25px'
         }}>
             <div className="card-box" style={{ maxWidth: '300px' }}>
-                
                 <div className="box">
-                    
-                   
                     {user.viewClients === 1 && (
                     <Link to="/clients" className="link">
                         <div className="boite ">Clients</div>
@@ -85,29 +112,47 @@ export function Roles() {
                     <Link to="/employes" className="link">
                         <div className="boite">Employés</div>
                     </Link>
-                     <Link to="/roles"className="siteactuel" >
-                    <div className="boite" >Role</div>
+                    <Link to="/roles" className="siteactuel" >
+                        <div className="boite" >Role</div>
                     </Link>
-
                 </div>
             </div>
             <div className="container">
                 <div className="section">
-                    <div className="row">
-                        <button 
-                            className="button is-primary"
-                            onClick={() => setIsModalOpen(true)}
-                        >
-                            Créer un rôle
-                        </button>
+                    {/* Structure avec bouton isolé à gauche et Filtre épuré à sa droite */}
+                    <div className="columns is-vcentered is-mobile">
+                        <div className="column is-narrow">
+                            <button 
+                                className="button is-primary"
+                                onClick={() => setIsModalOpen(true)}
+                            >
+                                Créer un rôle
+                            </button>
+                        </div>
+                        <div className="column">
+                            <Filter 
+                                placeholderText="Rechercher un rôle..."
+                                rechercheValue={recherche}
+                                onRechercheChange={handleRechercheChange}
+                            />
+                        </div>
                     </div>
                 </div>
+                
                 <div className="section">
                     <div className="row columns is-multiline is-mobile">
-                        {roles.map((role) => {
+                        {currentRoles.map((role) => {
                             return <AfficherRole key={role.id_role} role={role} onEditClick={handleEditClick} />;
                         })}
                     </div>
+                    {/* Le composant de pagination s'appuie désormais sur la liste filtrée */}
+                    <Pagination 
+                        totalShows={rolesFiltrés.length}
+                        showsPerPage={showsPerPage}
+                        setShowsPerPage={setShowsPerPage}
+                        currentPage={currentPage}
+                        paginate={paginate}
+                    />
                 </div>
             </div>
 

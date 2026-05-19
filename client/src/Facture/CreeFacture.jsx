@@ -5,7 +5,7 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
     const [formData, setFormData] = useState({
         client_name: "",
         client_id: null,
-        client_phone: "",
+        client_email: "", // Remplacé phone par email
         employe_name: "",
         employe_id: null,
         voiture_modele: "",
@@ -36,7 +36,7 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
 
         if (isOpen) {
             setFormData({
-                client_name: "", client_id: null, client_phone: "",
+                client_name: "", client_id: null, client_email: "", // Remplacé phone par email
                 employe_name: "", employe_id: null,
                 voiture_modele: "", voiture_id: null, voiture_couleur: "",
                 prix_vente: 0
@@ -55,7 +55,7 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
             if (name === "client_name") {
                 const match = allClients.find(c => c.full_name === value);
                 updated.client_id = match ? match.id_client : null;
-                updated.client_phone = match ? match.phone : "";
+                updated.client_email = match ? match.email : ""; // Remplacé phone par email
             }
 
             // 2. Liaison automatique Employé
@@ -66,7 +66,6 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
 
             // 3. Liaison automatique Voiture
             if (name === "voiture_modele") {
-                // Correspondance basée sur la valeur affichée dans l'option du datalist
                 const match = allVoitures.find(v => `${v.modele} - ${v.couleur}` === value);
                 updated.voiture_id = match ? match.id_voiture : null;
                 updated.voiture_couleur = match ? match.couleur : "";
@@ -96,7 +95,7 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
                             ...prev,
                             client_name: match.full_name,
                             client_id: match.id_client,
-                            client_phone: match.phone
+                            client_email: match.email // Remplacé phone par email
                         };
                     }
                     if (fieldName === 'employe_name') {
@@ -124,13 +123,11 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Plus besoin de chercher les correspondances ici, tout est déjà dans formData !
         if (!formData.client_id || !formData.employe_id || !formData.voiture_id) {
             alert("Erreur : Veuillez sélectionner des éléments valides dans les listes.");
             return;
         }
 
-        // Vérification du stock via l'ID trouvé
         const voitureSelectionnee = allVoitures.find(v => v.id_voiture === formData.voiture_id);
         if (voitureSelectionnee && voitureSelectionnee.stock <= 0) {
             alert("Impossible de vendre : ce véhicule est en rupture de stock.");
@@ -200,16 +197,16 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
                                 />
                                 <datalist id="clients-list">
                                     {allClients.map(c => (
-                                        <option key={c.id_client} value={c.full_name}>{c.phone}</option>
+                                        <option key={c.id_client} value={c.full_name}>{c.email}</option> // Remplacé phone par email
                                     ))}
                                 </datalist>
-                                {formData.client_phone && (
-                                    <p className="help is-info">Téléphone lié : {formData.client_phone}</p>
+                                {formData.client_email && (
+                                    <p className="help is-info">Email lié : {formData.client_email}</p> // Remplacé phone par email
                                 )}
                             </div>
                         </div>
 
-                        {/* CHAMP : EMPLOYÉ */}
+                        {/* ... Reste des champs (Employé et Voiture) inchangé ... */}
                         <div className="field">
                             <label className="label">Nom de l'employé(e)</label>
                             <div className="control">
@@ -232,7 +229,6 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
                             </div>
                         </div>
 
-                        {/* CHAMP : VOITURE */}
                         <div className="field">
                             <label className="label">Modèle de Voiture</label>
                             <div className="control">
@@ -250,33 +246,24 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
                                 <datalist id="voitures-list">
                                     {allVoitures.map(v => (
                                         <option key={v.id_voiture} value={`${v.modele} - ${v.couleur}`}>
-                                            Stock: {v.stock} - {v.prix}$
+                                            Stock: {v.stock} - {v.prix}€
                                         </option>
                                     ))}
                                 </datalist>
                                 {formData.voiture_couleur && (
-                                    <p className="help is-success">Couleur: {formData.voiture_couleur} | Prix: {formData.prix_vente}$</p>
+                                    <p className="help is-success">Couleur: {formData.voiture_couleur} | Prix: {formData.prix_vente}€</p>
                                 )}
                             </div>
                         </div>
 
-                        <div className="field is-grouped is-grouped mt-5">
+                        <div className="field is-grouped is-grouped-right mt-5">
                             <div className="control">
-                                <button 
-                                    className={`button is-primary ${isLoading ? 'is-loading' : ''}`} 
-                                    type="submit"
-                                    disabled={isLoading}
-                                >
+                                <button className={`button is-primary ${isLoading ? 'is-loading' : ''}`} type="submit">
                                     Créer la facture
                                 </button>
                             </div>
                             <div className="control">
-                                <button 
-                                    className="button is-white" 
-                                    type="button" 
-                                    onClick={onClose}
-                                    disabled={isLoading}
-                                >
+                                <button className="button is-white" type="button" onClick={onClose}>
                                     Annuler
                                 </button>
                             </div>

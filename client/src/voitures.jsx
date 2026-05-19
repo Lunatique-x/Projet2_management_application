@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react"; // Regroupement des imports React
 import { AfficherVoiture } from "./Voiture/AfficherVoiture";
 import { CreeVoiture } from "./Voiture/CreeVoiture";
 import { ModifierVoiture } from "./Voiture/ModifierVoiture";
-import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
+import { Pagination } from "./assets/Pagination";
+import { Filter } from "./assets/Filtre";
 
 export function Voiture() {
     const { user } = useContext(AuthContext);
@@ -13,12 +14,36 @@ export function Voiture() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedVoiture, setSelectedVoiture] = useState(null);
+    const [recherche, setRecherche] = useState("");
+
+    // --- ÉTATS REQUIS POUR VOTRE COMPOSANT PAGINATION ---
     const [currentPage, setCurrentPage] = useState(1);
-    const voituresPerPage = 12;
+    const [voituresPerPage, setVoituresPerPage] = useState(8); 
 
     if (!user || user.viewStock !== 1) {
-        return <div className="section">Accès refusé : vous n'avez pas la permission de voir les facutures.</div>;
+        return <div className="section">Accès refusé : vous n'avez pas la permission de voir le stock.</div>;
     }
+
+    // 1. Filtrage par chaîne de recherche (Modèle ou Marque)
+    // Ajustez 'c.marque' selon le nom exact de la clé retournée par votre API
+    const filteredVoitures = (voitures || []).filter((c) => {
+        const terme = recherche.toLowerCase();
+        const modeleVoiture = c.modele ? c.modele.toLowerCase() : "";
+        const marqueVoiture = c.marque ? c.marque.toLowerCase() : "";
+        
+        return modeleVoiture.includes(terme) || marqueVoiture.includes(terme);
+    });
+
+    // 2. Calcul des index de découpage basés sur vos variables d'état
+    const indexOfLastVoiture = currentPage * voituresPerPage;
+    const indexOfFirstVoitures = indexOfLastVoiture - voituresPerPage;
+    const currentVoitures = filteredVoitures.slice(indexOfFirstVoitures, indexOfLastVoiture);
+
+    // Réinitialisation de la page active à 1 lors d'une nouvelle recherche
+    const handleRechercheChange = (e) => {
+        setRecherche(e.target.value);
+        setCurrentPage(1);
+    };
 
     useEffect(() => {
         async function getVoitures() {
@@ -40,7 +65,7 @@ export function Voiture() {
     }, []);
 
     const handleVoitureCreated = () => {
-        const res = fetch("http://localhost:3000/allVoiture", {
+        fetch("http://localhost:3000/allVoiture", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem('token')}`,
@@ -56,7 +81,7 @@ export function Voiture() {
     };
 
     const handleVoitureModified = () => {
-        const res = fetch("http://localhost:3000/allVoiture", {
+        fetch("http://localhost:3000/allVoiture", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem('token')}`,
@@ -64,20 +89,6 @@ export function Voiture() {
             }
         }).then(res => res.json()).then(data => setVoitures(data));
     };
-
-    const totalPages = Math.ceil(voitures.length / voituresPerPage);
-    const startIndex = (currentPage - 1) * voituresPerPage;
-    const currentVoitures = voitures.slice(startIndex, startIndex + voituresPerPage);
-
-    useEffect(() => {
-        if (totalPages > 0 && currentPage > totalPages) {
-            setCurrentPage(totalPages);
-        }
-
-        if (totalPages === 0 && currentPage !== 1) {
-            setCurrentPage(1);
-        }
-    }, [currentPage, totalPages]);
 
     return (
         <div className="section" style={{
@@ -88,7 +99,6 @@ export function Voiture() {
         }}>
             <div className="card-box" style={{ maxWidth: '300px' }}>
                 <div className="box">
-
                     {user.viewClients === 1 && (
                         <Link to="/clients" className="link">
                             <div className="boite ">Clients</div>
@@ -119,13 +129,23 @@ export function Voiture() {
 
             <div className="container">
                 <div className="section">
-                    <div className="row">
-                        <button
-                            className="button is-primary"
-                            onClick={() => setIsModalOpen(true)}
-                        >
-                            Ajouter une voiture
-                        </button>
+                    {/* Agencement côte à côte : bouton isolé à gauche et Filtre épuré à sa droite */}
+                    <div className="columns is-vcentered is-mobile">
+                        <div className="column is-narrow">
+                            <button 
+                                className="button is-primary"
+                                onClick={() => setIsModalOpen(true)}
+                            >
+                                Ajouter une voiture
+                            </button>
+                        </div>
+                        <div className="column">
+                            <Filter 
+                                placeholderText="Rechercher par modèle ou marque..."
+                                rechercheValue={recherche}
+                                onRechercheChange={handleRechercheChange}
+                            />
+                        </div>
                     </div>
                 </div>
                 <div className="section">
@@ -134,45 +154,14 @@ export function Voiture() {
                             return <AfficherVoiture key={voiture.id_voiture} voiture={voiture} onEditClick={handleEditClick} />;
                         })}
                     </div>
+                    <Pagination 
+                        totalShows={filteredVoitures.length} 
+                        showsPerPage={voituresPerPage} 
+                        setShowsPerPage={setVoituresPerPage}
+                        currentPage={currentPage}
+                        paginate={setCurrentPage}
+                    />
                 </div>
-
-                {totalPages > 0 && (
-                    <div className="section" style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                        <p className="has-text-weight-semibold">
-                            Page {currentPage} sur {totalPages}
-                        </p>
-                        <nav className="pagination" role="navigation" aria-label="pagination">
-                            <button
-                                className="pagination-previous"
-                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                disabled={currentPage === 1}
-                            >
-                                Précédent
-                            </button>
-                            <button
-                                className="pagination-next"
-                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                disabled={currentPage === totalPages}
-                            >
-                                Suivant
-                            </button>
-                            <ul className="pagination-list">
-                                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
-                                    <li key={page}>
-                                        <button
-                                            className={`pagination-link ${currentPage === page ? 'is-current' : ''}`}
-                                            aria-label={`Page ${page}`}
-                                            aria-current={currentPage === page ? 'page' : undefined}
-                                            onClick={() => setCurrentPage(page)}
-                                        >
-                                            {page}
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                        </nav>
-                    </div>
-                )}
             </div>
 
             <CreeVoiture

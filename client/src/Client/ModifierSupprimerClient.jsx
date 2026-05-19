@@ -3,27 +3,33 @@ import { useContext } from "react";
 import { AuthContext } from "../AuthContext";
 
 export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
+    // Récupération des données utilisateur et de ses permissions (ex: delClients)
     const { user } = useContext(AuthContext);
+
+    // État local pour stocker les valeurs saisies dans les champs du formulaire
     const [formData, setFormData] = useState({
         full_name: "",
         email: "",
         phone: ""
     });
 
+    // États de gestion : indicateur de chargement API et messages d'erreur du PDF
     const [isLoading, setIsLoading] = useState(false);
     const [erreurPdf, setErreurPdf] = useState("");
 
+    // Hook synchronisant les champs du formulaire dès que le modal s'ouvre ou change de client
     useEffect(() => {
         if (client) {
             setFormData({
-                full_name: client.full_name,
-                email: client.email,
-                phone: client.phone
+                full_name: client.full_name || "", // Sécurité si la valeur est nulle
+                email: client.email || "",
+                phone: client.phone || ""
             });
-            setErreurPdf("");
+            setErreurPdf(""); // Réinitialise l'erreur à l'ouverture
         }
     }, [client, isOpen]);
 
+    // Gestionnaire générique des entrées clavier : met à jour l'état au fur et à mesure de la saisie
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -32,10 +38,16 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
         }));
     };
 
+    // Fonction de décodage et téléchargement du document PDF stocké localement
     const handleDownloadPdf = () => {
         setErreurPdf("");
         
-        // Récupération basée sur l'EMAIL initial du client d'origine
+        if (!client?.email) {
+            setErreurPdf("Données du client manquantes.");
+            return;
+        }
+
+        // Récupération de la chaîne Base64 liée à l'identifiant email unique du client
         const chaineBase64 = localStorage.getItem(`client_pdf_${client.email}`);
 
         if (!chaineBase64) {
@@ -44,25 +56,31 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
         }
 
         try {
+            // Nettoyage de l'en-tête "data:application/pdf;base64," si présent
             const parties = chaineBase64.split(',');
             const octetsBruts = atob(parties[1] || parties[0]);
             let n = octetsBruts.length;
             const tableauOctets = new Uint8Array(n);
 
+            // Conversion de la chaîne binaire brute en tableau de nombres 8 bits
             while (n--) {
                 tableauOctets[n] = octetsBruts.charCodeAt(n);
             }
 
+            // Génération d'un objet de fichier Blob typé en PDF
             const fichierBlob = new Blob([tableauOctets], { type: 'application/pdf' });
             const urlFichier = URL.createObjectURL(fichierBlob);
 
+            // Création d'un élément d'ancrage HTML invisible pour déclencher le téléchargement
             const lienTemporaire = document.createElement('a');
             lienTemporaire.href = urlFichier;
-            lienTemporaire.download = `Document_${client.full_name.replace(/\s+/g, '_')}.pdf`;
+            // Formatage du nom de fichier en remplaçant les espaces par des underscores
+            lienTemporaire.download = `Document_${(client.full_name || "client").replace(/\s+/g, '_')}.pdf`;
             
             document.body.appendChild(lienTemporaire);
-            lienTemporaire.click();
+            lienTemporaire.click(); // Simulation du clic utilisateur
             
+            // Nettoyage de la mémoire et de l'arbre DOM après téléchargement
             document.body.removeChild(lienTemporaire);
             URL.revokeObjectURL(urlFichier);
 
@@ -72,8 +90,11 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
         }
     };
 
+    // Soumission des modifications vers l'API Backend
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault(); // Stoppe le rechargement natif de la page
+        if (!client?.id_client) return;
+
         setIsLoading(true);
 
         try {
@@ -83,11 +104,11 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(formData) // Envoi des nouvelles données saisies
             });
 
             if (res.ok) {
-                // Si l'adresse email a changé, on transfère le PDF sur la nouvelle clé email
+                // Si l'e-mail change, on migre la clé du PDF local pour ne pas perdre le fichier
                 if (client.email !== formData.email) {
                     const ancienPdf = localStorage.getItem(`client_pdf_${client.email}`);
                     if (ancienPdf) {
@@ -97,8 +118,8 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                 }
 
                 const data = await res.json();
-                onClientModified(data);
-                onClose();
+                onClientModified(data); // Notifie le parent du succès de l'opération
+                onClose(); // Ferme la fenêtre modale
             }
         } catch (error) {
             console.error("Erreur:", error);
@@ -107,26 +128,31 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
         }
     };
 
+    // Suppression définitive du client
     const handleSupress = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
+        if (!client?.id_client) return;
+
+        // Fenêtre de confirmation de sécurité standard avant suppression
+        if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce client ?")) return;
+
         setIsLoading(true);
 
         try {
             const res = await fetch(`http://localhost:3000/delete/client/${client.id_client}`, {
-                method: "DELETE",
+                method: "DELETE", // Requête HTTP DELETE (sans corps de données superflu)
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`,
                     "Content-Type": "application/json"
-                },
-                body: JSON.stringify(formData)
+                }
             });
 
             if (res.ok) {
-                // Nettoyage basé sur l'EMAIL
+                // Suppression du fichier PDF local associé à l'e-mail du client supprimé
                 localStorage.removeItem(`client_pdf_${client.email}`);
 
                 const data = await res.json();
-                onClientModified(data);
+                onClientModified(data); // Rafraîchit la liste côté parent
                 onClose();
             }
         } catch (error) {
@@ -145,7 +171,8 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                     <button type="button" className="delete" onClick={onClose}></button>
                 </header>
                 <section className="modal-card-body">
-                    <form onSubmit={handleSubmit}>
+                    {/* ID ajouté au formulaire pour lier sémantiquement les boutons externes du footer */}
+                    <form id="edit-client-form" onSubmit={handleSubmit}>
                         <div className="field">
                             <label className="label">Nom complet</label>
                             <div className="control">
@@ -182,9 +209,11 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                     </form>
                 </section>
                 <footer className="modal-card-foot">
-                    <button className={`button is-success ${isLoading ? 'is-loading' : ''}`} onClick={handleSubmit} disabled={isLoading}>Modifier</button>
-                    {user.delClients  === 1 && (
-                        <button className={`button is-danger ${isLoading ? 'is-loading' : ''}`} onClick={handleSupress} disabled={isLoading}>Supprimer</button>
+                    {/* Le bouton utilise 'form="edit-client-form"' pour soumettre le formulaire situé hors de sa balise parent */}
+                    <button form="edit-client-form" type="submit" className={`button is-success ${isLoading ? 'is-loading' : ''}`} disabled={isLoading}>Modifier</button>
+                    {/* Le chaînage optionnel 'user?.delClients' empêche l'application de planter si le chargement du contexte est lent */}
+                    {user?.delClients === 1 && (
+                        <button type="button" className={`button is-danger ${isLoading ? 'is-loading' : ''}`} onClick={handleSupress} disabled={isLoading}>Supprimer</button>
                     )}
                     <button type="button" className="button is-light" onClick={onClose}>Annuler</button>
                 </footer>

@@ -1,18 +1,26 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react"; // Regroupement des imports React
 import { AfficherEmploye } from "./AfficherEmploye";
 import { CreeEmploye } from "./CreeEmploye";
 import { ModifierEmploye } from "./ModifierEmploye";
-import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
+import { Pagination } from "./assets/Pagination"; // Import de votre composant Pagination
+import { Filter } from "./assets/Filtre"; // Import de votre composant Filter
 
 export function Employe() {
-    //useContexte
+    // useContexte
     const { user } = useContext(AuthContext);
     const [employes, setEmployes] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedEmploye, setSelectedEmploye] = useState(null);
+
+    // État pour la recherche
+    const [recherche, setRecherche] = useState("");
+
+    // États pour la pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const [showsPerPage, setShowsPerPage] = useState(8); // Valeur par défaut identique à vos factures
 
     if (!user || user.role_name !== "admin") {
         return (
@@ -23,7 +31,6 @@ export function Employe() {
             </div>
         );
     }
-    
 
     useEffect(() => {
         getEmployes();
@@ -57,6 +64,27 @@ export function Employe() {
         getEmployes();
     };
 
+    // Gestion du changement de texte dans la recherche
+    const handleRechercheChange = (e) => {
+        setRecherche(e.target.value);
+        setCurrentPage(1); // Force le retour à la première page lors de la saisie
+    };
+
+    // Logique de filtrage par nom ou prénom
+    const employesFiltrés = employes.filter((emp) => {
+        const terme = recherche.toLowerCase();
+        const nomEmploye = emp.full_name ? emp.full_name.toLowerCase() : "";
+        
+        return nomEmploye.includes(terme);
+    });
+
+    // Logique de calcul de la pagination sur le tableau filtré
+    const indexOfLastShow = currentPage * showsPerPage;
+    const indexOfFirstShow = indexOfLastShow - showsPerPage;
+    const currentEmployes = employesFiltrés.slice(indexOfFirstShow, indexOfLastShow);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
     return (
         <div className="section" style={{
             display: 'flex',
@@ -65,9 +93,7 @@ export function Employe() {
             marginLeft: '25px'
         }}>
             <div className="card-box" style={{ maxWidth: '300px' }}>
-                
                 <div className="box">
-                    
                    {user.viewClients === 1 && (
                     <Link to="/clients" className="link">
                         <div className="boite ">Clients</div>
@@ -88,29 +114,48 @@ export function Employe() {
                     <Link to="/employes" className="siteactuel">
                         <div className="boite">Employés</div>
                     </Link>
-                     <Link to="/roles"className="link" >
-                    <div className="boite" >Role</div>
+                    <Link to="/roles" className="link" >
+                        <div className="boite" >Role</div>
                     </Link>
-
                 </div>
             </div>
             <div className="container">
                 <div className="section">
-                    <div className="row">
-                        <button 
-                            className="button is-primary"
-                            onClick={() => setIsModalOpen(true)}
-                        >
-                            Ajouter un employé
-                        </button>
+                    {/* Structure avec bouton isolé à gauche et Filtre épuré à sa droite */}
+                    <div className="columns is-vcentered is-mobile">
+                        <div className="column is-narrow">
+                            <button 
+                                className="button is-primary"
+                                onClick={() => setIsModalOpen(true)}
+                            >
+                                Ajouter un employé
+                            </button>
+                        </div>
+                        <div className="column">
+                            <Filter 
+                                placeholderText="Rechercher par nom ou prénom..."
+                                rechercheValue={recherche}
+                                onRechercheChange={handleRechercheChange}
+                            />
+                        </div>
                     </div>
                 </div>
                 <div className="section">
                     <div className="row columns is-multiline is-mobile">
-                        {employes.map((employe) => {
+                        {/* Utilisation du tableau filtré et découpé */}
+                        {currentEmployes.map((employe) => {
                             return <AfficherEmploye key={employe.id_employe} employe={employe} onEditClick={handleEditClick} />;
                         })}
                     </div>
+
+                    {/* Le total prend en compte le nombre d'éléments après filtrage */}
+                    <Pagination 
+                        totalShows={employesFiltrés.length}
+                        showsPerPage={showsPerPage}
+                        setShowsPerPage={setShowsPerPage}
+                        currentPage={currentPage}
+                        paginate={paginate}
+                    />
                 </div>
             </div>
 

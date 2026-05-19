@@ -12,6 +12,13 @@ app.post('/client', async (req, res) => {
     const { full_name, email, phone } = req.body;
 
     try {
+        const clientExistant = await db('client')
+            .where({ email })
+            .first();
+        if (clientExistant) {
+            return res.status(400).json({ error: "Un client avec cette adresse email existe déjà." });
+        }
+
         const [id] = await db('client').insert({ full_name, email, phone });
         res.json({ message: 'Client créé avec succès', id });
     } catch (err) {
@@ -31,10 +38,10 @@ app.post('/voiture', async (req, res) => {
 });
 //un nouveau Role
 app.post('/role', async (req, res) => {
-    const { nom, seeStock, modStock, seeClients, modClients, modSell, addClient } = req.body;
+    const { nom, viewStock, modStock, viewClients, delClients, modClients, viewSell, addSell, addClient, addStock, delStock, modSell, delSell } = req.body;
 
     try {
-        const [id] = await db('role').insert({ nom, seeStock, modStock, seeClients, modClients, modSell, addClient });
+        const [id] = await db('role').insert({ nom, viewStock, modStock, viewClients, delClients, modClients, viewSell, addSell, addClient, addStock, delStock, modSell, delSell });
         res.json({ message: 'Role créé avec succès', id });
     } catch (err) {
         res.status(500).json(err);
