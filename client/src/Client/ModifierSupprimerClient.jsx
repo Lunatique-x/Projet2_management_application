@@ -13,7 +13,7 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
         phone: ""
     });
 
-    // États de gestion : indicateur de chargement API et messages d'erreur du PDF
+    // États de gestion : indicateur de chargement API et messages d'erreur du PDF / validation
     const [isLoading, setIsLoading] = useState(false);
     const [erreurPdf, setErreurPdf] = useState("");
 
@@ -95,6 +95,15 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
         if (e) e.preventDefault(); // Stoppe le rechargement natif de la page
         if (!client?.id_client) return;
 
+        setErreurPdf(""); // Réinitialise l'erreur au début de la soumission
+
+        // Validation du format de téléphone (Ex: 514-123-4567)
+        const regexTelephone = /^\d{3}-\d{3}-\d{4}$/;
+        if (!regexTelephone.test(formData.phone)) {
+            setErreurPdf("Erreur : Le numéro de téléphone doit respecter le format XXX-XXX-XXXX (ex: 514-123-4567).");
+            return; // Bloque la soumission
+        }
+
         setIsLoading(true);
 
         try {
@@ -120,9 +129,12 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                 const data = await res.json();
                 onClientModified(data); // Notifie le parent du succès de l'opération
                 onClose(); // Ferme la fenêtre modale
+            } else {
+                setErreurPdf("Erreur serveur lors de la modification du client.");
             }
         } catch (error) {
             console.error("Erreur:", error);
+            setErreurPdf("Une erreur est survenue lors de l'envoi des données.");
         } finally {
             setIsLoading(false);
         }
@@ -137,10 +149,11 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
         if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce client ?")) return;
 
         setIsLoading(true);
+        setErreurPdf("");
 
         try {
             const res = await fetch(`http://localhost:3000/delete/client/${client.id_client}`, {
-                method: "DELETE", // Requête HTTP DELETE (sans corps de données superflu)
+                method: "DELETE", // Requête HTTP DELETE
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`,
                     "Content-Type": "application/json"
@@ -154,9 +167,12 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                 const data = await res.json();
                 onClientModified(data); // Rafraîchit la liste côté parent
                 onClose();
+            } else {
+                setErreurPdf("Erreur serveur lors de la suppression du client.");
             }
         } catch (error) {
             console.error("Erreur:", error);
+            setErreurPdf("Une erreur est survenue lors de la suppression.");
         } finally {
             setIsLoading(false);
         }
@@ -170,9 +186,15 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                     <p className="modal-card-title">Modifier le client</p>
                     <button type="button" className="delete" onClick={onClose}></button>
                 </header>
-                <section className="modal-card-body">
-                    {/* ID ajouté au formulaire pour lier sémantiquement les boutons externes du footer */}
-                    <form id="edit-client-form" onSubmit={handleSubmit}>
+                <form id="edit-client-form" onSubmit={handleSubmit}>
+                    <section className="modal-card-body">
+                        {/* Affichage de la notification d'erreur Bulma */}
+                        {erreurPdf && (
+                            <div className="notification is-danger is-light">
+                                {erreurPdf}
+                            </div>
+                        )}
+
                         <div className="field">
                             <label className="label">Nom complet</label>
                             <div className="control">
@@ -190,10 +212,19 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                         <div className="field">
                             <label className="label">Téléphone</label>
                             <div className="control">
-                                <input className="input" type="tel" name="phone" value={formData.phone} onChange={handleChange} required />
+                                <input 
+                                    className="input" 
+                                    type="tel" 
+                                    name="phone" 
+                                    value={formData.phone} 
+                                    onChange={handleChange} 
+                                    placeholder="514-123-4567"
+                                    required 
+                                />
                             </div>
                         </div>
 
+                        {/* Bouton de téléchargement du PDF existant */}
                         <div className="field mt-5">
                             <label className="label">Fichier joint</label>
                             <div className="control">
@@ -206,17 +237,24 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                             </div>
                             {erreurPdf && <p className="help is-danger mt-2">{erreurPdf}</p>}
                         </div>
-                    </form>
-                </section>
-                <footer className="modal-card-foot">
-                    {/* Le bouton utilise 'form="edit-client-form"' pour soumettre le formulaire situé hors de sa balise parent */}
-                    <button form="edit-client-form" type="submit" className={`button is-success ${isLoading ? 'is-loading' : ''}`} disabled={isLoading}>Modifier</button>
-                    {/* Le chaînage optionnel 'user?.delClients' empêche l'application de planter si le chargement du contexte est lent */}
-                    {user?.delClients === 1 && (
-                        <button type="button" className={`button is-danger ${isLoading ? 'is-loading' : ''}`} onClick={handleSupress} disabled={isLoading}>Supprimer</button>
-                    )}
-                    <button type="button" className="button is-light" onClick={onClose}>Annuler</button>
-                </footer>
+                    </section>
+
+                    <footer className="modal-card-foot">
+                        <div className="buttons">
+                            <button type="submit" className={`button is-primary ${isLoading ? 'is-loading' : ''}`} disabled={isLoading}>
+                                Enregistrer
+                            </button>
+                            {user?.role === "admin" && (
+                                <button type="button" className="button is-danger" onClick={handleSupress} disabled={isLoading}>
+                                    Supprimer
+                                </button>
+                            )}
+                            <button type="button" className="button" onClick={onClose} disabled={isLoading}>
+                                Annuler
+                            </button>
+                        </div>
+                    </footer>
+                </form>
             </div>
         </div>
     );

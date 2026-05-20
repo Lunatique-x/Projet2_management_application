@@ -70,7 +70,6 @@ export function CreeClient({ isOpen, onClose, onClientCreated }) {
         });
     };
 
-    // Nouvelle fonction pour réinitialiser les états et fermer la modale
     const handleAnnuler = () => {
         setFormData({
             full_name: "",
@@ -79,11 +78,20 @@ export function CreeClient({ isOpen, onClose, onClientCreated }) {
         });
         setFichier(null);
         setErreurFichier("");
-        onClose(); // Appelle la fonction de fermeture du parent
+        onClose();
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setErreurFichier(""); // Réinitialise l'erreur au début
+
+        // 1. Validation du format de téléphone (Ex: 514-123-4567)
+        const regexTelephone = /^\d{3}-\d{3}-\d{4}$/;
+        if (!regexTelephone.test(formData.phone)) {
+            setErreurFichier("Erreur : Le numéro de téléphone doit respecter le format XXX-XXX-XXXX (ex: 514-123-4567).");
+            return; // Bloque la soumission
+        }
+
         setIsLoading(true);
 
         try {
@@ -126,16 +134,21 @@ export function CreeClient({ isOpen, onClose, onClientCreated }) {
 
     return (
         <div className={`modal ${isOpen ? 'is-active' : ''}`}>
-            {/* Clic à l'extérieur de la boîte de dialogue : réinitialise et ferme */}
             <div className="modal-background" onClick={handleAnnuler}></div>
             <div className="modal-card">
                 <header className="modal-card-head">
                     <p className="modal-card-title">Créer un nouveau client</p>
-                    {/* Bouton croix en haut à droite : réinitialise et ferme */}
                     <button type="button" className="delete" onClick={handleAnnuler}></button>
                 </header>
-                <section className="modal-card-body">
-                    <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit}>
+                    <section className="modal-card-body">
+                        {/* 2. Affichage de l'erreur Bulma s'il y a un problème de téléphone ou de fichier */}
+                        {erreurFichier && (
+                            <div className="notification is-danger is-light">
+                                {erreurFichier}
+                            </div>
+                        )}
+
                         <div className="field">
                             <label className="label">Nom complet</label>
                             <div className="control">
@@ -173,6 +186,7 @@ export function CreeClient({ isOpen, onClose, onClientCreated }) {
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleChange}
+                                    placeholder="514-123-4567"
                                     required
                                 />
                             </div>
@@ -185,35 +199,35 @@ export function CreeClient({ isOpen, onClose, onClientCreated }) {
                                     <input className="file-input" type="file" name="pdf" accept=".pdf,application/pdf" onChange={handleFileChange} />
                                     <span className="file-cta is-flex is-flex-direction-column is-align-items-center p-6" style={{ border: estSurvole ? '2px solid #485fc7' : '1px solid #b5d0f5', borderRadius: '16px', backgroundColor: '#f4f8ff', cursor: 'pointer', height: 'auto' }}>
                                         <div className="is-flex is-justify-content-center mb-3">
-                                            {/* Carré bleu supérieur avec l'icône FontAwesome fonctionnelle */}
-                                            <div className="is-flex is-justify-content-center mb-3">
-                                                <div 
-                                                    className="has-background-link is-flex is-align-items-center is-justify-content-center"
-                                                    style={{ width: '48px', height: '48px', borderRadius: '12px' }}
-                                                >
-                                                    {/* "fas fa-file-pdf" définit la forme, "fa-lg" ajuste la taille idéale, et "has-text-white" la met en blanc */}
-                                                    <i className="fas fa-file-pdf fa-lg has-text-white"></i>
-                                                </div>
+                                            <div 
+                                                className="has-background-link is-flex is-align-items-center is-justify-content-center"
+                                                style={{ width: '48px', height: '48px', borderRadius: '12px' }}
+                                            >
+                                                <span className="file-icon has-text-white" style={{ margin: 0 }}>
+                                                    <i className="fas fa-file-pdf fa-lg"></i>
+                                                </span>
                                             </div>
                                         </div>
-                                        <span className="file-label is-size-6 has-text-weight-normal has-text-black p-0" style={{ display: 'inline' }}>
-                                            <span className="has-text-link has-text-weight-semibold" style={{ textDecoration: 'underline' }}>Click To Upload</span> or drag and drop
+                                        <span className="file-label has-text-centered has-text-weight-semibold has-text-black">
+                                            {fichier ? fichier.name : "Glissez votre PDF ici ou cliquez pour parcourir"}
                                         </span>
                                     </span>
                                 </label>
                             </div>
-                            
-                            {/* Messages d'information bas de page */}
-                            {erreurFichier && <div className="notification is-danger is-light mt-2 py-2 px-3 is-size-7">{erreurFichier}</div>}
-                            {fichier && <div className="notification is-success is-light mt-2 py-2 px-3 is-size-7">Fichier prêt : <strong>{fichier.name}</strong></div>}
                         </div>
-                    </form>
-                </section>
-                <footer className="modal-card-foot">
-                    {/* Bouton Annuler en bas : réinitialise et ferme */}
-                    <button type="button" className="button" onClick={handleAnnuler}>Annuler</button>
-                    <button type="submit" className={`button is-success ${isLoading ? 'is-loading' : ''}`} onClick={handleSubmit} disabled={isLoading}>Créer</button>
-                </footer>
+                    </section>
+
+                    <footer className="modal-card-foot">
+                        <div className="buttons">
+                            <button type="submit" className={`button is-primary ${isLoading ? 'is-loading' : ''}`} disabled={isLoading}>
+                                Créer
+                            </button>
+                            <button type="button" className="button" onClick={handleAnnuler} disabled={isLoading}>
+                                Annuler
+                            </button>
+                        </div>
+                    </footer>
+                </form>
             </div>
         </div>
     );
