@@ -131,6 +131,7 @@ export function Voiture() {
                 <div className="section">
                     {/* Agencement côte à côte : bouton isolé à gauche et Filtre épuré à sa droite */}
                     <div className="columns is-vcentered is-mobile">
+                        {user.addStock === 1 && (
                         <div className="column is-narrow">
                             <button 
                                 className="button is-primary"
@@ -139,6 +140,7 @@ export function Voiture() {
                                 Ajouter une voiture
                             </button>
                         </div>
+                        )}
                         <div className="column">
                             <Filter 
                                 placeholderText="Rechercher par modèle ou marque..."

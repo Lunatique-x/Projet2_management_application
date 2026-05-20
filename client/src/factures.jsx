@@ -121,6 +121,7 @@ export function Factures() {
                 <div className="section">
                     {/* Structure avec bouton isolé à gauche et Filtre épuré à sa droite */}
                     <div className="columns is-vcentered is-mobile">
+                        {user.addSell === 1 && (
                         <div className="column is-narrow">
                             <button 
                                 className="button is-primary"
@@ -129,6 +130,7 @@ export function Factures() {
                                 Créer une Facture
                             </button>
                         </div>
+                        )}
                         <div className="column">
                             <Filter 
                                 placeholderText="Rechercher par client ou employé..."
