@@ -1,57 +1,98 @@
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import { useContext } from "react";
+import voitureHome from "./assets/voiturehome.png";
 
 
 
 export function Home() {
     //useContexte
-    const { user } = useContext(AuthContext);
+    const { user, logout } = useContext(AuthContext);
+    const navigate = useNavigate();
 
-    if (!user) {
-        return <div style={{ padding: '40px' }}>Chargement ou non connecté...</div>;
-    }
+    const handleAuthClick = () => {
+        if (user) {
+            logout();
+            navigate("/");
+        } else {
+            navigate("/login");
+        }
+    };
+
+    const handleHomeClick = () => {
+        // Si on est déjà sur la home, recharger la page
+        if (window.location.pathname === "/" || window.location.pathname === "/home") {
+            window.location.reload();
+        } else {
+            navigate("/");
+        }
+    };
     return (
-        /* On remplace la classe "section" par une div simple pour éviter les marges de Bulma */
-        <div style={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            width: '100%',
-            paddingTop: '100px',
-            boxSizing: 'border-box',
-            paddingLeft: '40px',
-            marginLeft: '0px',
-            alignItems: 'flex-start'
-        }}>
-            <div className="card-box" style={{ maxWidth: '300px' }}>
-                <div className="box">
-                    {user.viewClients === 1 && (
-                        <Link to="/clients" className="link">
-                            <div className="boite">Clients</div>
-                        </Link>
-                    )}
-                    {user.viewStock === 1 && (
-                        <Link to="/voitures" className="link">
-                            <div className="boite">Voitures</div>
-                        </Link>
-                    )}
+        <div className="home-hero">
+            <div className="home-hero__noise" aria-hidden="true"></div>
+            
+            <div className="home-hero__content">
+                <section className="home-hero__copy">
+                    <p className="home-hero__eyebrow">Gestion du Concessionnaire</p>
+                    <br />
+                    <h1 className="home-hero__title">
+                        ADHK
+                    </h1>
+                    <br />
+                    <br />
+                    <br />
+                    <p className="home-hero__subtitle">
+                        Une interface claire pour gérer vos clients, vos voitures et vos factures dans un seul espace.
+                    </p>
 
-                    {user.viewSell === 1 && (
-                        <Link to="/factures" className="link">
-                            <div className="boite">Factures</div>
-                        </Link>
-                    )}
-                    {user.role_name === "admin" && (
-                        <>
-                            <Link to="/employes" className="link">
-                                <div className="boite">Employés</div>
+                    <div className="home-hero__actions">
+                        {user && user.viewStock === 1 && (
+                            <Link to="/voitures" className="hero-btn hero-btn--primary">
+                                Gérer les voitures
                             </Link>
-                            <Link to="/roles" className="link">
-                                <div className="boite">Role</div>
+                        )}
+                        {user && user.viewClients === 1 && (
+                            <Link to="/clients" className="hero-btn hero-btn--secondary">
+                                Accéder aux clients
                             </Link>
-                        </>
-                    )}
-                </div>
+                        )}
+                    </div>
+
+                    <div className="home-hero__links">
+                        {user && user.viewClients === 1 && (
+                            <Link to="/clients" className="hero-link-pill">
+                                Clients
+                            </Link>
+                        )}
+                        {user && user.viewStock === 1 && (
+                            <Link to="/voitures" className="hero-link-pill">
+                                Voitures
+                            </Link>
+                        )}
+                        {user && user.viewSell === 1 && (
+                            <Link to="/factures" className="hero-link-pill">
+                                Factures
+                            </Link>
+                        )}
+                        {user && user.role_name === "admin" && (
+                            <>
+                                <Link to="/employes" className="hero-link-pill">
+                                    Employés
+                                </Link>
+                                <Link to="/roles" className="hero-link-pill">
+                                    Rôle
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                </section>
+
+                <section className="home-hero__visual" aria-hidden="true">
+                    <div className="home-hero__image-frame">
+                        <div className="home-hero__image-glow"></div>
+                        <img className="home-hero__image" src={voitureHome} alt="Luxury car" />
+                    </div>
+                </section>
             </div>
         </div>
     );

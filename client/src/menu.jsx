@@ -1,17 +1,24 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "./AuthContext";
 
 export function Menu() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const isLoginPage = location.pathname.toLowerCase() === "/";
+  const { user, logout } = useContext(AuthContext);
 
-  if (isLoginPage) {
-    return null;
-  }
+  const handleAuthClick = () => {
+    if (user) {
+      logout();
+      navigate("/");
+    } else {
+      navigate("/login");
+    }
+  };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
+  const handleHomeClick = () => {
     navigate("/");
   };
 
@@ -29,19 +36,25 @@ export function Menu() {
       }}>
 
         <div className="navbar-brand">
-          <Link to="/home" className="navbar-item" style={{ paddingLeft: '0' }}>
-            Home
-          </Link>
+          {/* Home link moved to Home hero; keep navbar-brand for logo or future items */}
         </div>
 
         <div className="navbar-menu is-active" style={{ display: 'flex', flexGrow: 1, backgroundColor: 'transparent' }}>
-          <div className="navbar-end" style={{ marginLeft: 'auto', display: 'flex' }}>
-            <div className="navbar-item" style={{ paddingRight: '0' }}>
+          <div className="navbar-end" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+            <div className="menu-top-buttons" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <button
-                className="button is-danger"
-                onClick={handleLogout}
+                onClick={handleHomeClick}
+                className="home-hero__auth-btn"
+                aria-label="Home"
               >
-                Déconnexion
+                Home
+              </button>
+              <button
+                onClick={handleAuthClick}
+                className="home-hero__auth-btn"
+                aria-label={user ? "Se déconnecter" : "Se connecter"}
+              >
+                {user ? "Déconnexion" : "Connexion"}
               </button>
             </div>
           </div>
