@@ -157,8 +157,8 @@
 
 .home-hero__title {
     margin: 0;
-    font-size: clamp(2.7rem, 5.4vw, 5.2rem);
-    line-height: 0.98;
+    font-size: clamp(4rem, 8vw, 8rem);
+    line-height: 0.92;
     font-weight: 800;
     letter-spacing: -0.04em;
     text-wrap: balance;
