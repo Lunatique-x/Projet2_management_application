@@ -41,51 +41,55 @@ export function Login() {
   };
 
   return (
-  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-    <div className="box" style={{ width: '100%', maxWidth: '400px', borderRadius: '15px', border: '2px solid #3273dc', padding: '2rem' }}>
-      
-      {/* Le titre  centré */}
-      <h2 className="title is-3 has-text-centered">Connexion</h2>
-      
-      <form onSubmit={PageSubmit}>
-        {/* On utilise les classes field et label de Bulma pour l'espacement */}
-        <div className="field">
-          <label className="label">Email</label>
-          <div className="control">
-            <input 
-              className="input"
-              type="email" 
-              placeholder="votre@email.com"
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              required 
-            />
-          </div>
+    <div className="login-page">
+      <div className="login-page__brand">
+        <h1 className="login-page__brand-title">ADHK</h1>
+      </div>
+
+      <div className="login-page__card box">
+        <div className="login-page__header">
+          <p className="login-page__eyebrow">Gestion du Concessionnaire</p>
+          <h2 className="title is-3 login-page__title">Connexion</h2>
         </div>
 
-        <div className="field">
-          <label className="label">Mot de passe</label>
-          <div className="control">
-            <input 
-              className="input" 
-              type="password" 
-              placeholder="*******"
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
-            />
+        <form onSubmit={PageSubmit} className="login-page__form">
+          <div className="field">
+            <label className="label">Email</label>
+            <div className="control">
+              <input 
+                className="input"
+                type="email" 
+                placeholder="votre@email.com"
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                required 
+              />
+            </div>
           </div>
-        </div>
-        {/* meme fonctionalité que le data.message et help permet de confuer la typographie du message erreur. */}
-        {error && <p className="help is-danger has-text-centered" style={{ fontSize: '1rem' }}>{error}</p>} 
 
-        <div className="control mt-5">
-          <button type="submit" className="button is-success is-fullwidth is-medium ">
-            Se connecter
-          </button>
-        </div>
-      </form>
+          <div className="field">
+            <label className="label">Mot de passe</label>
+            <div className="control">
+              <input 
+                className="input" 
+                type="password" 
+                placeholder="*******"
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required 
+              />
+            </div>
+          </div>
+
+          {error && <p className="help is-danger has-text-centered login-page__error">{error}</p>} 
+
+          <div className="control mt-5">
+            <button type="submit" className="button is-success is-fullwidth is-medium login-page__submit">
+              Se connecter
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
 );
 }
