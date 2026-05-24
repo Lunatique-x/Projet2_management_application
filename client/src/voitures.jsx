@@ -3,7 +3,7 @@ import { useEffect, useState, useContext } from "react"; // Regroupement des imp
 import { AfficherVoiture } from "./Voiture/AfficherVoiture";
 import { CreeVoiture } from "./Voiture/CreeVoiture";
 import { ModifierVoiture } from "./Voiture/ModifierVoiture";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "./authContext";
 import { Pagination } from "./assets/Pagination";
 import { Filter } from "./assets/Filtre";
 

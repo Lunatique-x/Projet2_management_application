@@ -4,7 +4,7 @@ import { AfficherClient } from "./Client/AfficherClient";
 import { CreeClient } from "./Client/CreeClient";
 import { ModifierClient } from "./Client/ModifierSupprimerClient";
 import { Pagination } from "./assets/Pagination"; // Assurez-vous que le chemin vers votre composant est correct
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "./authContext";
 import { Filter } from "./assets/Filtre"; // Import de votre nouveau composant Filter
 
 export function Clients() {

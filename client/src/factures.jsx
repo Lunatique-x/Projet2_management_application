@@ -3,7 +3,7 @@ import { AfficherFacture } from "./Facture/AfficherFacture";
 import { useState, useEffect, useContext } from "react"; // Regroupement des imports React
 import { CreeFacture } from "./Facture/CreeFacture";
 import { ModifierFacture } from "./Facture/ModifierSupprimerFacture";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "./authContext";
 import { Pagination } from "./assets/Pagination"; // Import de votre composant Pagination
 import { Filter } from "./assets/Filtre"; // Import de votre composant Filter
 

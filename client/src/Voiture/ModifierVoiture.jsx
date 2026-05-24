@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { useContext } from "react";
-import { AuthContext } from "../AuthContext";
+import { AuthContext } from "../authContext";
 
 export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture }) {
     const { user } = useContext(AuthContext);

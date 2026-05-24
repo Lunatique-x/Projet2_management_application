@@ -1,6 +1,6 @@
 import { useState,useContext } from "react";
 import { useNavigate } from "react-router-dom"; // Pour une redirection propre
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "./authContext";
 
 export function Login() {
   const [email, setEmail] = useState('');

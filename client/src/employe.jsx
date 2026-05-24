@@ -3,7 +3,7 @@ import { useEffect, useState, useContext } from "react"; // Regroupement des imp
 import { AfficherEmploye } from "./AfficherEmploye";
 import { CreeEmploye } from "./CreeEmploye";
 import { ModifierEmploye } from "./ModifierEmploye";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "./authContext";
 import { Pagination } from "./assets/Pagination"; // Import de votre composant Pagination
 import { Filter } from "./assets/Filtre"; // Import de votre composant Filter
 
