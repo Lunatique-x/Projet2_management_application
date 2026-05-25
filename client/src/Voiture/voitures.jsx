@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState, useContext } from "react"; // Regroupement des imports React
-import { AfficherVoiture } from "./Voiture/AfficherVoiture";
-import { CreeVoiture } from "./Voiture/CreeVoiture";
-import { ModifierVoiture } from "./Voiture/ModifierVoiture";
-import { AuthContext } from "./authContext";
-import { Pagination } from "./assets/Pagination";
-import { Filter } from "./assets/Filtre";
+import { AfficherVoiture } from "./AfficherVoiture";
+import { CreeVoiture } from "./CreeVoiture";
+import { ModifierVoiture } from "./ModifierVoiture";
+import { AuthContext } from "../Securite/authContext";
+import { Pagination } from "../assets/Pagination";
+import { Filter } from "../assets/Filtre";
 
 export function Voiture() {
     const { user } = useContext(AuthContext);

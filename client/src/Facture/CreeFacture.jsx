@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchClients, fetchEmployees, fetchVoitures } from "../api";
+import { fetchClients, fetchEmployees, fetchVoitures } from "../Api/api";
 
 export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
     const [formData, setFormData] = useState({

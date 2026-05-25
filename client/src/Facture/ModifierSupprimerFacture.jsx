@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useContext } from "react";
-import { AuthContext } from "../authContext";
+import { AuthContext } from "../Securite/authContext";
 import { 
     fetchClients, 
     fetchEmployees, 
     fetchVoitures, 
     updateFacture, 
     deleteFacture 
-} from "../api";
+} from "../Api/api";
 
 export function ModifierFacture({ isOpen, onClose, onFactureModified, facture }) {
     const { user } = useContext(AuthContext);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useContext } from "react";
-import { AuthContext } from "../authContext";
+import { AuthContext } from "../Securite/authContext";
 
 export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
     // Récupération des données utilisateur et de ses permissions (ex: delClients)

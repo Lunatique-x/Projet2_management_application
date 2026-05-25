@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "./authContext";
+import { AuthContext } from "../Securite/authContext";
 import { useContext } from "react";
-import voitureHome from "./assets/voiturehome.png";
+import voitureHome from "../assets/voiturehome.png";
 
 
 

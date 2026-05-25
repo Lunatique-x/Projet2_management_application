@@ -1,67 +1,56 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState, useContext } from "react"; // Regroupement des imports React
-import { AfficherEmploye } from "./AfficherEmploye";
-import { CreeEmploye } from "./CreeEmploye";
-import { ModifierEmploye } from "./ModifierEmploye";
-import { AuthContext } from "./authContext";
-import { Pagination } from "./assets/Pagination"; // Import de votre composant Pagination
-import { Filter } from "./assets/Filtre"; // Import de votre composant Filter
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../Securite/authContext";
+import { AfficherRole } from "./AfficherRole";
+import { CreeRole } from "./CreeRole";
+import { ModifierRole } from "./ModifierRole";
+import { Pagination } from "../assets/Pagination";
+import { Filter } from "../assets/Filtre"; // Import de votre composant Filter
 
-export function Employe() {
-    // useContexte
+export function Roles() { 
+    // ajout du use contexte
     const { user } = useContext(AuthContext);
-    const [employes, setEmployes] = useState([]);
+    const [roles, setRoles] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedEmploye, setSelectedEmploye] = useState(null);
+    const [selectedRole, setSelectedRole] = useState(null);
 
     // État pour la recherche
     const [recherche, setRecherche] = useState("");
 
     // États pour la pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const [showsPerPage, setShowsPerPage] = useState(8); // Valeur par défaut identique à vos factures
-
-    if (!user || user.role_name !== "admin") {
-        return (
-            <div className="section">
-                <h1 className="title is-4">Accès refusé</h1>
-                <p>Vous n'avez pas les permissions nécessaires pour gérer les employés.</p>
-                <Link to="/home">Retour à l'accueil</Link>
-            </div>
-        );
-    }
+    const [showsPerPage, setShowsPerPage] = useState(8);
 
     useEffect(() => {
-        getEmployes();
+        getRole();
     }, []);
 
-    async function getEmployes() {
-        const res = await fetch("http://localhost:3000/allEmploye", {
+    async function getRole() {
+        const res = await fetch("http://localhost:3000/allRole", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem('token')}`,
                 "Content-Type": "application/json"
             }
         });
-
         if (res.ok) {
             const data = await res.json();
-            setEmployes(data);
+            setRoles(data);
         }
     }
 
-    const handleEmployeCreated = () => {
-        getEmployes();
+    const handleRoleCreated = () => {
+        getRole();
     };
 
-    const handleEditClick = (employeToEdit) => {
-        setSelectedEmploye(employeToEdit);
+    const handleEditClick = (roleToEdit) => {
+        setSelectedRole(roleToEdit);
         setIsEditModalOpen(true);
     };
 
-    const handleEmployeModified = () => {
-        getEmployes();
+    const handleRoleModified = () => {
+        getRole();
     };
 
     // Gestion du changement de texte dans la recherche
@@ -70,18 +59,27 @@ export function Employe() {
         setCurrentPage(1); // Force le retour à la première page lors de la saisie
     };
 
-    // Logique de filtrage par nom ou prénom
-    const employesFiltrés = employes.filter((emp) => {
+    if (!user || user.role_name !== "admin") {
+        return (
+            <div className="section">
+                <h1 className="title is-4">Accès refusé</h1>
+                <p>Vous n'avez pas les permissions nécessaires pour gérer les roles.</p>
+                <Link to="/home">Retour à l'accueil</Link>
+            </div>
+        );
+    }
+
+    // Logique de filtrage par nom de rôle
+    const rolesFiltrés = roles.filter((r) => {
         const terme = recherche.toLowerCase();
-        const nomEmploye = emp.full_name ? emp.full_name.toLowerCase() : "";
-        
-        return nomEmploye.includes(terme);
+        const nomRole = r.nom ? r.nom.toLowerCase() : "";
+        return nomRole.includes(terme);
     });
 
     // Logique de calcul de la pagination sur le tableau filtré
     const indexOfLastShow = currentPage * showsPerPage;
     const indexOfFirstShow = indexOfLastShow - showsPerPage;
-    const currentEmployes = employesFiltrés.slice(indexOfFirstShow, indexOfLastShow);
+    const currentRoles = rolesFiltrés.slice(indexOfFirstShow, indexOfLastShow);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -94,7 +92,7 @@ export function Employe() {
         }}>
             <div className="card-box" style={{ maxWidth: '300px' }}>
                 <div className="box">
-                   {user.viewClients === 1 && (
+                    {user.viewClients === 1 && (
                     <Link to="/clients" className="link">
                         <div className="boite ">Clients</div>
                     </Link>
@@ -111,10 +109,10 @@ export function Employe() {
                     </Link>
                     )}
 
-                    <Link to="/employes" className="siteactuel">
+                    <Link to="/employes" className="link">
                         <div className="boite">Employés</div>
                     </Link>
-                    <Link to="/roles" className="link" >
+                    <Link to="/roles" className="siteactuel" >
                         <div className="boite" >Role</div>
                     </Link>
                 </div>
@@ -128,29 +126,28 @@ export function Employe() {
                                 className="button is-primary"
                                 onClick={() => setIsModalOpen(true)}
                             >
-                                Ajouter un employé
+                                Créer un rôle
                             </button>
                         </div>
                         <div className="column">
                             <Filter 
-                                placeholderText="Rechercher par nom ou prénom..."
+                                placeholderText="Rechercher un rôle..."
                                 rechercheValue={recherche}
                                 onRechercheChange={handleRechercheChange}
                             />
                         </div>
                     </div>
                 </div>
+                
                 <div className="section">
                     <div className="row columns is-multiline is-mobile">
-                        {/* Utilisation du tableau filtré et découpé */}
-                        {currentEmployes.map((employe) => {
-                            return <AfficherEmploye key={employe.id_employe} employe={employe} onEditClick={handleEditClick} />;
+                        {currentRoles.map((role) => {
+                            return <AfficherRole key={role.id_role} role={role} onEditClick={handleEditClick} />;
                         })}
                     </div>
-
-                    {/* Le total prend en compte le nombre d'éléments après filtrage */}
+                    {/* Le composant de pagination s'appuie désormais sur la liste filtrée */}
                     <Pagination 
-                        totalShows={employesFiltrés.length}
+                        totalShows={rolesFiltrés.length}
                         showsPerPage={showsPerPage}
                         setShowsPerPage={setShowsPerPage}
                         currentPage={currentPage}
@@ -159,16 +156,17 @@ export function Employe() {
                 </div>
             </div>
 
-            <CreeEmploye 
+            <CreeRole 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)}
-                onEmployeCreated={handleEmployeCreated}
+                onRoleCreated={handleRoleCreated}
             />
-            <ModifierEmploye
+
+            <ModifierRole
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
-                onEmployeModified={handleEmployeModified}
-                employe={selectedEmploye}
+                onRoleModified={handleRoleModified}
+                role={selectedRole}
             />
         </div>
     );

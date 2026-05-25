@@ -1,85 +1,83 @@
-import { Link } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "./authContext";
-import { AfficherRole } from "./Role/AfficherRole";
-import { CreeRole } from "./Role/CreeRole";
-import { ModifierRole } from "./Role/ModifierRole";
-import { Pagination } from "./assets/Pagination";
-import { Filter } from "./assets/Filtre"; // Import de votre composant Filter
+import { Link, useNavigate } from "react-router-dom";
+import { AfficherFacture } from "./AfficherFacture";
+import { useState, useEffect, useContext } from "react"; // Regroupement des imports React
+import { CreeFacture } from "./CreeFacture";
+import { ModifierFacture } from "./ModifierSupprimerFacture";
+import { AuthContext } from "../Securite/authContext";
+import { Pagination } from "../assets/Pagination"; // Import de votre composant Pagination
+import { Filter } from "../assets/Filtre"; // Import de votre composant Filter
 
-export function Roles() { 
-    // ajout du use contexte
+export function Factures() {
+    // useContexte
     const { user } = useContext(AuthContext);
-    const [roles, setRoles] = useState([]);
+    const [factures, setFactures] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedRole, setSelectedRole] = useState(null);
+    const [selectedFacture, setSelectedFacture] = useState(null);
 
     // État pour la recherche
     const [recherche, setRecherche] = useState("");
 
     // États pour la pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const [showsPerPage, setShowsPerPage] = useState(8);
+    const [showsPerPage, setShowsPerPage] = useState(8); // Valeur par défaut de départ (ex: 8)
+
+    if (!user || user.viewSell !== 1) {
+        return <div className="section">Accès refusé : vous n'avez pas la permission de voir les facutures.</div>;
+    }
 
     useEffect(() => {
-        getRole();
+        getFactures();
     }, []);
 
-    async function getRole() {
-        const res = await fetch("http://localhost:3000/allRole", {
+    async function getFactures() {
+        const res = await fetch("http://localhost:3000/allFactures", { 
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem('token')}`,
                 "Content-Type": "application/json"
             }
         });
+
         if (res.ok) {
             const data = await res.json();
-            setRoles(data);
+            setFactures(data);
+        } else {
+            console.error("Erreur lors de la récupération des factures");
         }
     }
 
-    const handleRoleCreated = () => {
-        getRole();
+    const handleFacture = () => {
+        getFactures();
     };
 
-    const handleEditClick = (roleToEdit) => {
-        setSelectedRole(roleToEdit);
+    const handleEditClick = (factureToEdit) => {
+        if (user?.modSell !== 1) return;
+        setSelectedFacture(factureToEdit);
         setIsEditModalOpen(true);
-    };
-
-    const handleRoleModified = () => {
-        getRole();
     };
 
     // Gestion du changement de texte dans la recherche
     const handleRechercheChange = (e) => {
         setRecherche(e.target.value);
-        setCurrentPage(1); // Force le retour à la première page lors de la saisie
+        setCurrentPage(1); // Réinitialise à la première page lors d'une recherche
     };
 
-    if (!user || user.role_name !== "admin") {
-        return (
-            <div className="section">
-                <h1 className="title is-4">Accès refusé</h1>
-                <p>Vous n'avez pas les permissions nécessaires pour gérer les roles.</p>
-                <Link to="/home">Retour à l'accueil</Link>
-            </div>
-        );
-    }
-
-    // Logique de filtrage par nom de rôle
-    const rolesFiltrés = roles.filter((r) => {
+    // Logique de filtrage par nom de client ou nom d'employé
+    // Adapter 'nom_client' et 'nom_employe' selon les clés exactes de vos objets JSON
+    const facturesFiltrées = factures.filter((f) => {
         const terme = recherche.toLowerCase();
-        const nomRole = r.nom ? r.nom.toLowerCase() : "";
-        return nomRole.includes(terme);
+        const nomClient = f.client_nom ? f.client_nom.toLowerCase() : "";
+        const nomEmploye = f.employe_nom ? f.employe_nom.toLowerCase() : "";
+        const nomVoiture = f.voiture_modele ? f.voiture_modele.toLowerCase() : "";
+        
+        return nomClient.includes(terme) || nomEmploye.includes(terme) || nomVoiture.includes(terme);
     });
 
-    // Logique de calcul de la pagination sur le tableau filtré
+    // Logique de calcul de la pagination sur les éléments filtrés
     const indexOfLastShow = currentPage * showsPerPage;
     const indexOfFirstShow = indexOfLastShow - showsPerPage;
-    const currentRoles = rolesFiltrés.slice(indexOfFirstShow, indexOfLastShow);
+    const currentFactures = facturesFiltrées.slice(indexOfFirstShow, indexOfLastShow);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -103,51 +101,55 @@ export function Roles() {
                         <div className="boite">Voitures</div>
                     </Link>
                     )}
-                    {user.viewSell === 1 && (
-                    <Link to="/factures" className="link">
+
+                    <Link to="/factures" className="siteactuel">
                         <div className="boite">Factures</div>
                     </Link>
-                    )}
-
+                    {user.role_name === "admin" && (  
+                    <>
                     <Link to="/employes" className="link">
                         <div className="boite">Employés</div>
                     </Link>
-                    <Link to="/roles" className="siteactuel" >
+                    <Link to="/roles" className="link" >
                         <div className="boite" >Role</div>
                     </Link>
+                    </>
+                    )}
                 </div>
             </div>
             <div className="container">
                 <div className="section">
                     {/* Structure avec bouton isolé à gauche et Filtre épuré à sa droite */}
                     <div className="columns is-vcentered is-mobile">
+                        {user.addSell === 1 && (
                         <div className="column is-narrow">
                             <button 
                                 className="button is-primary"
                                 onClick={() => setIsModalOpen(true)}
                             >
-                                Créer un rôle
+                                Créer une Facture
                             </button>
                         </div>
+                        )}
                         <div className="column">
                             <Filter 
-                                placeholderText="Rechercher un rôle..."
+                                placeholderText="Rechercher par client ou employé..."
                                 rechercheValue={recherche}
                                 onRechercheChange={handleRechercheChange}
                             />
                         </div>
                     </div>
                 </div>
-                
                 <div className="section">
                     <div className="row columns is-multiline is-mobile">
-                        {currentRoles.map((role) => {
-                            return <AfficherRole key={role.id_role} role={role} onEditClick={handleEditClick} />;
+                        {/* Utilisation du tableau filtré et paginé */}
+                        {currentFactures.map((f) => {
+                            return <AfficherFacture key={f.id_payement} facture={f} onEditClick={handleEditClick} />;
                         })}
                     </div>
-                    {/* Le composant de pagination s'appuie désormais sur la liste filtrée */}
+                    {/* Le composant de pagination prend désormais en compte la longueur du tableau filtré */}
                     <Pagination 
-                        totalShows={rolesFiltrés.length}
+                        totalShows={facturesFiltrées.length}
                         showsPerPage={showsPerPage}
                         setShowsPerPage={setShowsPerPage}
                         currentPage={currentPage}
@@ -155,18 +157,16 @@ export function Roles() {
                     />
                 </div>
             </div>
-
-            <CreeRole 
+            <CreeFacture 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)}
-                onRoleCreated={handleRoleCreated}
+                onFactureCreated={handleFacture}
             />
-
-            <ModifierRole
-                isOpen={isEditModalOpen}
+            <ModifierFacture 
+                isOpen={isEditModalOpen} 
                 onClose={() => setIsEditModalOpen(false)}
-                onRoleModified={handleRoleModified}
-                role={selectedRole}
+                onFactureModified={handleFacture} 
+                facture={selectedFacture} 
             />
         </div>
     );

@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState, useContext } from "react"; // Regroupement des imports React
-import { AfficherClient } from "./Client/AfficherClient";
-import { CreeClient } from "./Client/CreeClient";
-import { ModifierClient } from "./Client/ModifierSupprimerClient";
-import { Pagination } from "./assets/Pagination"; // Assurez-vous que le chemin vers votre composant est correct
-import { AuthContext } from "./authContext";
-import { Filter } from "./assets/Filtre"; // Import de votre nouveau composant Filter
+import { AfficherClient } from "./AfficherClient";
+import { CreeClient } from "./CreeClient";
+import { ModifierClient } from "./ModifierSupprimerClient";
+import { Pagination } from "../assets/Pagination"; // Assurez-vous que le chemin vers votre composant est correct
+import { AuthContext } from "../Securite/authContext";
+import { Filter } from "../assets/Filtre"; // Import de votre nouveau composant Filter
 
 export function Clients() {
     const { user } = useContext(AuthContext);

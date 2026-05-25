@@ -1,37 +1,43 @@
-import { Link, useNavigate } from "react-router-dom";
-import { AfficherFacture } from "./Facture/AfficherFacture";
-import { useState, useEffect, useContext } from "react"; // Regroupement des imports React
-import { CreeFacture } from "./Facture/CreeFacture";
-import { ModifierFacture } from "./Facture/ModifierSupprimerFacture";
-import { AuthContext } from "./authContext";
-import { Pagination } from "./assets/Pagination"; // Import de votre composant Pagination
-import { Filter } from "./assets/Filtre"; // Import de votre composant Filter
+import { Link } from "react-router-dom";
+import { useEffect, useState, useContext } from "react"; // Regroupement des imports React
+import { AfficherEmploye } from "./AfficherEmploye";
+import { CreeEmploye } from "./CreeEmploye";
+import { ModifierEmploye } from "./ModifierEmploye";
+import { AuthContext } from "../Securite/authContext";
+import { Pagination } from "../assets/Pagination"; // Import de votre composant Pagination
+import { Filter } from "../assets/Filtre"; // Import de votre composant Filter
 
-export function Factures() {
+export function Employe() {
     // useContexte
     const { user } = useContext(AuthContext);
-    const [factures, setFactures] = useState([]);
+    const [employes, setEmployes] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedFacture, setSelectedFacture] = useState(null);
+    const [selectedEmploye, setSelectedEmploye] = useState(null);
 
     // État pour la recherche
     const [recherche, setRecherche] = useState("");
 
     // États pour la pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const [showsPerPage, setShowsPerPage] = useState(8); // Valeur par défaut de départ (ex: 8)
+    const [showsPerPage, setShowsPerPage] = useState(8); // Valeur par défaut identique à vos factures
 
-    if (!user || user.viewSell !== 1) {
-        return <div className="section">Accès refusé : vous n'avez pas la permission de voir les facutures.</div>;
+    if (!user || user.role_name !== "admin") {
+        return (
+            <div className="section">
+                <h1 className="title is-4">Accès refusé</h1>
+                <p>Vous n'avez pas les permissions nécessaires pour gérer les employés.</p>
+                <Link to="/home">Retour à l'accueil</Link>
+            </div>
+        );
     }
 
     useEffect(() => {
-        getFactures();
+        getEmployes();
     }, []);
 
-    async function getFactures() {
-        const res = await fetch("http://localhost:3000/allFactures", { 
+    async function getEmployes() {
+        const res = await fetch("http://localhost:3000/allEmploye", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem('token')}`,
@@ -41,43 +47,41 @@ export function Factures() {
 
         if (res.ok) {
             const data = await res.json();
-            setFactures(data);
-        } else {
-            console.error("Erreur lors de la récupération des factures");
+            setEmployes(data);
         }
     }
 
-    const handleFacture = () => {
-        getFactures();
+    const handleEmployeCreated = () => {
+        getEmployes();
     };
 
-    const handleEditClick = (factureToEdit) => {
-        if (user?.modSell !== 1) return;
-        setSelectedFacture(factureToEdit);
+    const handleEditClick = (employeToEdit) => {
+        setSelectedEmploye(employeToEdit);
         setIsEditModalOpen(true);
+    };
+
+    const handleEmployeModified = () => {
+        getEmployes();
     };
 
     // Gestion du changement de texte dans la recherche
     const handleRechercheChange = (e) => {
         setRecherche(e.target.value);
-        setCurrentPage(1); // Réinitialise à la première page lors d'une recherche
+        setCurrentPage(1); // Force le retour à la première page lors de la saisie
     };
 
-    // Logique de filtrage par nom de client ou nom d'employé
-    // Adapter 'nom_client' et 'nom_employe' selon les clés exactes de vos objets JSON
-    const facturesFiltrées = factures.filter((f) => {
+    // Logique de filtrage par nom ou prénom
+    const employesFiltrés = employes.filter((emp) => {
         const terme = recherche.toLowerCase();
-        const nomClient = f.client_nom ? f.client_nom.toLowerCase() : "";
-        const nomEmploye = f.employe_nom ? f.employe_nom.toLowerCase() : "";
-        const nomVoiture = f.voiture_modele ? f.voiture_modele.toLowerCase() : "";
+        const nomEmploye = emp.full_name ? emp.full_name.toLowerCase() : "";
         
-        return nomClient.includes(terme) || nomEmploye.includes(terme) || nomVoiture.includes(terme);
+        return nomEmploye.includes(terme);
     });
 
-    // Logique de calcul de la pagination sur les éléments filtrés
+    // Logique de calcul de la pagination sur le tableau filtré
     const indexOfLastShow = currentPage * showsPerPage;
     const indexOfFirstShow = indexOfLastShow - showsPerPage;
-    const currentFactures = facturesFiltrées.slice(indexOfFirstShow, indexOfLastShow);
+    const currentEmployes = employesFiltrés.slice(indexOfFirstShow, indexOfLastShow);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -90,7 +94,7 @@ export function Factures() {
         }}>
             <div className="card-box" style={{ maxWidth: '300px' }}>
                 <div className="box">
-                    {user.viewClients === 1 && (
+                   {user.viewClients === 1 && (
                     <Link to="/clients" className="link">
                         <div className="boite ">Clients</div>
                     </Link>
@@ -101,39 +105,35 @@ export function Factures() {
                         <div className="boite">Voitures</div>
                     </Link>
                     )}
-
-                    <Link to="/factures" className="siteactuel">
+                    {user.viewSell === 1 && (
+                    <Link to="/factures" className="link">
                         <div className="boite">Factures</div>
                     </Link>
-                    {user.role_name === "admin" && (  
-                    <>
-                    <Link to="/employes" className="link">
+                    )}
+
+                    <Link to="/employes" className="siteactuel">
                         <div className="boite">Employés</div>
                     </Link>
                     <Link to="/roles" className="link" >
                         <div className="boite" >Role</div>
                     </Link>
-                    </>
-                    )}
                 </div>
             </div>
             <div className="container">
                 <div className="section">
                     {/* Structure avec bouton isolé à gauche et Filtre épuré à sa droite */}
                     <div className="columns is-vcentered is-mobile">
-                        {user.addSell === 1 && (
                         <div className="column is-narrow">
                             <button 
                                 className="button is-primary"
                                 onClick={() => setIsModalOpen(true)}
                             >
-                                Créer une Facture
+                                Ajouter un employé
                             </button>
                         </div>
-                        )}
                         <div className="column">
                             <Filter 
-                                placeholderText="Rechercher par client ou employé..."
+                                placeholderText="Rechercher par nom ou prénom..."
                                 rechercheValue={recherche}
                                 onRechercheChange={handleRechercheChange}
                             />
@@ -142,14 +142,15 @@ export function Factures() {
                 </div>
                 <div className="section">
                     <div className="row columns is-multiline is-mobile">
-                        {/* Utilisation du tableau filtré et paginé */}
-                        {currentFactures.map((f) => {
-                            return <AfficherFacture key={f.id_payement} facture={f} onEditClick={handleEditClick} />;
+                        {/* Utilisation du tableau filtré et découpé */}
+                        {currentEmployes.map((employe) => {
+                            return <AfficherEmploye key={employe.id_employe} employe={employe} onEditClick={handleEditClick} />;
                         })}
                     </div>
-                    {/* Le composant de pagination prend désormais en compte la longueur du tableau filtré */}
+
+                    {/* Le total prend en compte le nombre d'éléments après filtrage */}
                     <Pagination 
-                        totalShows={facturesFiltrées.length}
+                        totalShows={employesFiltrés.length}
                         showsPerPage={showsPerPage}
                         setShowsPerPage={setShowsPerPage}
                         currentPage={currentPage}
@@ -157,16 +158,17 @@ export function Factures() {
                     />
                 </div>
             </div>
-            <CreeFacture 
+
+            <CreeEmploye 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)}
-                onFactureCreated={handleFacture}
+                onEmployeCreated={handleEmployeCreated}
             />
-            <ModifierFacture 
-                isOpen={isEditModalOpen} 
+            <ModifierEmploye
+                isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
-                onFactureModified={handleFacture} 
-                facture={selectedFacture} 
+                onEmployeModified={handleEmployeModified}
+                employe={selectedEmploye}
             />
         </div>
     );
