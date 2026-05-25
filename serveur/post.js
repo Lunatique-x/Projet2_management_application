@@ -30,10 +30,24 @@ app.post('/voiture', async (req, res) => {
     const { modele, stock, couleur, prix } = req.body;
 
     try {
+        // 1. Sécurité : Vérifie si une voiture possède déjà ce modèle ET cette couleur
+        const voitureExistante = await db('voiture')
+            .where({ modele: modele, couleur: couleur })
+            .first();
+
+        if (voitureExistante) {
+            return res.status(400).json({ 
+                message: 'Ce modèle existe déjà avec cette couleur.' 
+            });
+        }
+
+        // 2. Insertion si la combinaison modèle/couleur est unique
         const [id] = await db('voiture').insert({ modele, stock, couleur, prix });
         res.json({ message: 'Voiture créée avec succès', id });
+        
     } catch (err) {
-        res.status(500).json(err);
+        console.error(err);
+        res.status(500).json({ message: 'Erreur interne du serveur' });
     }
 });
 //un nouveau Role

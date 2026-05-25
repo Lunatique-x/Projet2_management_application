@@ -12,6 +12,7 @@ export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
 
     const [roles, setRoles] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [emailError, setEmailError] = useState(""); // État pour stocker l'erreur d'email
 
     useEffect(() => {
         async function getRoles() {
@@ -34,11 +35,41 @@ export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
 
         if (isOpen) {
             getRoles();
+            setEmailError(""); // Réinitialise l'erreur à l'ouverture du modal
         }
     }, [isOpen]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        // Efface le message d'erreur dès que l'utilisateur modifie l'email
+        if (name === "email") {
+            setEmailError("");
+        }
+
+        // Logique de formatage automatique pour le champ téléphone
+        if (name === "phone") {
+            // Supprime tout ce qui n'est pas un chiffre
+            const cleaned = value.replace(/\D/g, "");
+            
+            // Limite à 10 chiffres maximum
+            const truncated = cleaned.slice(0, 10);
+            
+            // Applique le masque 123-456-7890 au fur et à mesure de la saisie
+            let formattedPhone = truncated;
+            if (truncated.length > 3 && truncated.length <= 6) {
+                formattedPhone = `${truncated.slice(0, 3)}-${truncated.slice(3)}`;
+            } else if (truncated.length > 6) {
+                formattedPhone = `${truncated.slice(0, 3)}-${truncated.slice(3, 6)}-${truncated.slice(6)}`;
+            }
+
+            setFormData(prev => ({
+                ...prev,
+                [name]: formattedPhone
+            }));
+            return;
+        }
+
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -47,6 +78,15 @@ export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setEmailError(""); // Réinitialise l'erreur avant la soumission
+
+        // Sécurité Regex : Vérifie strictement le format 123-456-7890
+        const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
+        if (!phoneRegex.test(formData.phone)) {
+            alert("Erreur : Le numéro de téléphone doit respecter le format 123-456-7890");
+            return;
+        }
+
         setIsLoading(true);
 
         try {
@@ -58,7 +98,7 @@ export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
                 },
                 body: JSON.stringify({
                     ...formData,
-                    role_id: formData.id_role // Change parameter name for the API
+                    role_id: formData.id_role
                 })
             });
 
@@ -74,6 +114,12 @@ export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
                     id_role: ""
                 });
                 onClose();
+            } else if (res.status === 400) {
+                // Intercepte l'erreur 400 envoyée par l'API pour l'email en doublon
+                const errorData = await res.json().catch(() => ({}));
+                setEmailError(errorData.message || "Cet adresse email est déjà utilisée.");
+            } else {
+                alert("Une erreur inattendue est survenue.");
             }
         } catch (error) {
             console.error("Erreur:", error);
@@ -88,7 +134,7 @@ export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
             <div className="modal-card">
                 <header className="modal-card-head">
                     <p className="modal-card-title">Ajouter un nouvel employé</p>
-                    <button className="delete" onClick={onClose}></button>
+                    <button className="delete" type="button" onClick={onClose}></button>
                 </header>
                 <section className="modal-card-body">
                     <form onSubmit={handleSubmit}>
@@ -118,6 +164,12 @@ export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
                                     required
                                 />
                             </div>
+                            {/* Message d'erreur injecté sous le champ email */}
+                            {emailError && (
+                                <p className="help is-danger" style={{ color: "#f14668", fontSize: "0.75rem", marginTop: "0.25rem" }}>
+                                    {emailError}
+                                </p>
+                            )}
                         </div>
 
                         <div className="field">
@@ -141,6 +193,9 @@ export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
                                     className="input"
                                     type="tel"
                                     name="phone"
+                                    placeholder="123-456-7890"
+                                    pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                                    title="Le format doit être 123-456-7890"
                                     value={formData.phone}
                                     onChange={handleChange}
                                     required

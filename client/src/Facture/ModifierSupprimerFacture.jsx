@@ -118,8 +118,16 @@ export function ModifierFacture({ isOpen, onClose, onFactureModified, facture })
     const handleUpdate = async (e) => {
         if (e) e.preventDefault();
         
+        // 1. Validation des sélections
         if (!formData.client_id || !formData.employe_id || !formData.voiture_id) {
             alert("Erreur : Veuillez sélectionner des éléments valides dans les listes.");
+            return;
+        }
+
+        // 2. Validation du Stock (Uniquement si la voiture a changé)
+        const voitureAChange = formData.voiture_id !== facture.voiture_id;
+        if (voitureAChange && isOutOfStock) {
+            alert("Erreur : Cette voiture est actuellement en rupture de stock.");
             return;
         }
 
@@ -135,6 +143,8 @@ export function ModifierFacture({ isOpen, onClose, onFactureModified, facture })
             if (res && res.ok) {
                 onFactureModified();
                 onClose();
+            } else {
+                alert("Une erreur est survenue lors de la mise à jour côté serveur.");
             }
         } catch (error) {
             console.error("Erreur de modification:", error);

@@ -85,7 +85,7 @@ export function CreeClient({ isOpen, onClose, onClientCreated }) {
         e.preventDefault();
         setErreurFichier(""); // Réinitialise l'erreur au début
 
-        // 1. Validation du format de téléphone (Ex: 514-123-4567)
+        // Validation du format de téléphone (Ex: 514-123-4567)
         const regexTelephone = /^\d{3}-\d{3}-\d{4}$/;
         if (!regexTelephone.test(formData.phone)) {
             setErreurFichier("Erreur : Le numéro de téléphone doit respecter le format XXX-XXX-XXXX (ex: 514-123-4567).");
@@ -184,6 +184,7 @@ export function CreeClient({ isOpen, onClose, onClientCreated }) {
                                     className="input"
                                     type="tel"
                                     name="phone"
+                                    pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
                                     value={formData.phone}
                                     onChange={handleChange}
                                     placeholder="514-123-4567"

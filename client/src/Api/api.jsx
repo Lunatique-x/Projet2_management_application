@@ -80,7 +80,7 @@ export const updateEmployee = async (id, data) => {
 // Fonction pour SUPPRIMER une facture
 export const deleteFacture = async (id) => {
     try {
-        const res = await fetch(`${API_URL}/delete/payment/${id}`, {
+        const res = await fetch(`${API_URL}/delete/payement/${id}`, {
             method: "DELETE",
             headers: getHeaders()
         });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function CreeVoiture({ isOpen, onClose, onVoitureCreated }) {
     const [formData, setFormData] = useState({
@@ -9,9 +9,21 @@ export function CreeVoiture({ isOpen, onClose, onVoitureCreated }) {
     });
 
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(""); // Nouvel état pour l'erreur de doublon
+
+    // Réinitialise l'erreur à chaque ouverture du modal
+    useEffect(() => {
+        if (isOpen) {
+            setErrorMessage("");
+        }
+    }, [isOpen]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        
+        // Efface le message d'erreur dès que l'utilisateur modifie un champ
+        setErrorMessage("");
+
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -20,6 +32,7 @@ export function CreeVoiture({ isOpen, onClose, onVoitureCreated }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setErrorMessage("");
         setIsLoading(true);
 
         try {
@@ -47,9 +60,14 @@ export function CreeVoiture({ isOpen, onClose, onVoitureCreated }) {
                     prix: ""
                 });
                 onClose();
+            } else {
+                // Intercepte la réponse en cas d'erreur de doublon (Statut 400 ou autre)
+                const errorData = await res.json().catch(() => ({}));
+                setErrorMessage(errorData.message || "Ce modèle existe déjà avec cette couleur.");
             }
         } catch (error) {
             console.error("Erreur:", error);
+            setErrorMessage("Impossible de contacter le serveur.");
         } finally {
             setIsLoading(false);
         }
@@ -125,6 +143,15 @@ export function CreeVoiture({ isOpen, onClose, onVoitureCreated }) {
                                 />
                             </div>
                         </div>
+
+                        {/* Affichage du message de sécurité juste avant les boutons de validation */}
+                        {errorMessage && (
+                            <div className="field">
+                                <p className="help is-danger" style={{ color: "#f14668", fontSize: "0.85rem", marginBottom: "1rem", fontWeight: "500" }}>
+                                    {errorMessage}
+                                </p>
+                            </div>
+                        )}
 
                         <div className="field is-grouped">
                             <div className="control">
