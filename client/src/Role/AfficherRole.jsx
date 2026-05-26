@@ -77,7 +77,7 @@ export function AfficherRole(props) {
     const role = props.role;
 
     return (
-        <div className="column is-4-desktop is-6-tablet is-12-mobile">
+        <div className="column is-3-desktop is-6-tablet is-12-mobile">
             <div
                 className="card has-text-black has-background-white-ter is-clickable"
                 onClick={() => props.onEditClick(props.role)}

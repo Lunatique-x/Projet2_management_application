@@ -286,7 +286,7 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                             <button type="submit" className={`button is-primary ${isLoading ? 'is-loading' : ''}`} disabled={isLoading}>
                                 Enregistrer
                             </button>
-                            {user?.role === "admin" && (
+                            {user?.delClients === 1 && (
                                 <button type="button" className="button is-danger" onClick={handleSupress} disabled={isLoading}>
                                     Supprimer
                                 </button>

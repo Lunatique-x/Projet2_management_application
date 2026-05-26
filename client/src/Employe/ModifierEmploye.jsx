@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { InputTelephone } from "../assets/TelepohoneForm";
+
 export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe }) {
     const [formData, setFormData] = useState({
         full_name: "",
@@ -10,14 +11,14 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
         role_id: ""
     });
     const [roles, setRoles] = useState([]);
+    const [allEmployes, setAllEmployes] = useState([]); // Pour vérifier les doublons d'email
     const [isLoading, setIsLoading] = useState(false);
-
-    // L'état pour gérer et afficher les erreurs dans le modal
     const [erreurSaisie, setErreurSaisie] = useState("");
 
     useEffect(() => {
         if (!isOpen) return;
 
+        // Récupération des rôles
         async function getRoles() {
             try {
                 const res = await fetch("http://localhost:3000/allRole", {
@@ -36,24 +37,31 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
             }
         }
 
-        getRoles();
-    }, [isOpen]);
+        // Récupération de tous les employés pour valider l'unicité de l'email
+        async function getAllEmployes() {
+            try {
+                const res = await fetch("http://localhost:3000/allEmploye", { 
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setAllEmployes(data || []);
+                }
+            } catch (error) {
+                console.error("Erreur lors du chargement de la liste des employés:", error);
+            }
+        }
 
-    // useEffect(() => {
-    //     if (!employe) return;
-    //     setFormData({
-    //         full_name: employe.full_name || "",
-    //         email: employe.email || "",
-    //         password: "",
-    //         phone: employe.phone || "",
-    //         commission: employe.commission || 0,
-    //         role_id: employe.role_id || ""
-    //     });
-    // }, [employe]);
+        getRoles();
+        getAllEmployes();
+    }, [isOpen]);
 
     useEffect(() => {
         if (!employe) return;
-
 
         let rawPhone = employe.phone || "";
         let formattedPhone = rawPhone;
@@ -73,13 +81,12 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
             full_name: employe.full_name || "",
             email: employe.email || "",
             password: "",
-            phone: formattedPhone, // On applique le numéro formaté ici
+            phone: formattedPhone, 
             commission: employe.commission || 0,
             role_id: employe.role_id || ""
         });
-        setErreurSaisie(""); // Réinitialise l'erreur au changement d'employé
+        setErreurSaisie(""); 
     }, [employe]);
-
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -93,9 +100,20 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
         e.preventDefault();
         if (!employe) return;
 
-        //recommence input
         setErreurSaisie("");
 
+        // 1. BLOCAGE LOCALE SI L'EMAIL EXISTE DÉJÀ (sur un AUTRE employé)
+        const emailExisteDeja = allEmployes.some(emp => 
+            emp.id_employe !== employe.id_employe && 
+            emp.email.trim().toLowerCase() === formData.email.trim().toLowerCase()
+        );
+
+        if (emailExisteDeja) {
+            setErreurSaisie("Cet email existe déjà.");
+            return;
+        }
+
+        // 2. VÉRIFICATION DU FORMAT DU TÉLÉPHONE
         const regexTelephone = /^\d{3}-\d{3}-\d{4}$/;
         if (!regexTelephone.test(formData.phone)) {
             setErreurSaisie("Le numéro de téléphone doit être complet (ex: 514-123-4567).");
@@ -126,17 +144,15 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
             });
 
             if (res.ok) {
-                await res.json();
                 onEmployeModified();
                 onClose();
             } else {
-                const errorData = await res.json();
-                setErreurSaisie(errorData.message || "Erreur lors de la mise à jour de l'employé.");
-                console.error("Erreur de mise à jour de l'employé :", errorData);
+                const errorData = await res.json().catch(() => ({}));
+                setErreurSaisie(errorData.message || "Cet email existe déjà.");
             }
         } catch (error) {
             setErreurSaisie("Une erreur réseau ou serveur est survenue.");
-            console.error("Erreur lors de la mise à jour de l'employé :", error);
+            console.error("Erreur lors de la mise à jour :", error);
         } finally {
             setIsLoading(false);
         }
@@ -146,7 +162,6 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
         if (!employe) return;
         const confirmed = window.confirm("Voulez-vous vraiment supprimer cet employé ? Cette action est irréversible.");
         if (!confirmed) return;
-
 
         setIsLoading(true);
         setErreurSaisie("");
@@ -160,15 +175,14 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
             });
 
             if (res.ok) {
-                await res.json();
                 onEmployeModified();
                 onClose();
             } else {
-                const errorData = await res.json();
-                console.error("Erreur lors de la suppression de l'employé :", errorData);
+                const errorData = await res.json().catch(() => ({}));
+                setErreurSaisie(errorData.message || "Erreur lors de la suppression de l'employé.");
             }
         } catch (error) {
-            console.error("Erreur lors de la suppression de l'employé :", error);
+            console.error("Erreur lors de la suppression :", error);
         } finally {
             setIsLoading(false);
         }
@@ -180,17 +194,11 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
             <div className="modal-card">
                 <header className="modal-card-head">
                     <p className="modal-card-title">Modifier l'employé</p>
-                    {/* <button className="delete" onClick={onClose}></button> */}
                     <button type="button" className="delete" onClick={onClose}></button>
                 </header>
                 <section className="modal-card-body">
-                    {erreurSaisie && (
-                        <div className="notification is-danger is-light">
-                            <button type="button" className="delete" onClick={() => setErreurSaisie("")}></button>
-                            {erreurSaisie}
-                        </div>
-                    )}
                     <form onSubmit={handleSubmit}>
+                        
                         <div className="field">
                             <label className="label">Nom complet</label>
                             <div className="control">
@@ -231,20 +239,6 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
                                 />
                             </div>
                         </div>
-
-                        {/* <div className="field">
-                            <label className="label">Téléphone</label>
-                            <div className="control">
-                                <input
-                                    className="input"
-                                    type="tel"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div> */}
 
                         <InputTelephone
                             label="Téléphone"
@@ -289,6 +283,12 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
                                 </div>
                             </div>
                         </div>
+                        {/* EMPLACEMENT DU MESSAGE D'ERREUR SOUS LE PRIX */}
+                        {erreurSaisie && (
+                            <p className="help is-danger has-text-danger mt-3" style={{ fontSize: "0.95rem", fontWeight: "500" }}>
+                                {erreurSaisie}
+                            </p>
+                        )}
 
                         <div className="field is-grouped">
                             <div className="control">

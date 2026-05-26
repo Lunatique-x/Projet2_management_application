@@ -73,6 +73,7 @@ export function ModifierFacture({ isOpen, onClose, onFactureModified, facture })
         setFormData(prev => {
             const updated = { ...prev, [name]: value };
 
+            // Trouve les Id pour chaque Input
             if (name === "client_name") {
                 const match = allClients.find(c => c.full_name === value);
                 updated.client_id = match ? match.id_client : null;
@@ -87,6 +88,14 @@ export function ModifierFacture({ isOpen, onClose, onFactureModified, facture })
                 updated.voiture_id = match ? match.id_voiture : null;
                 updated.voiture_couleur = match ? match.couleur : "";
             }
+            // Ajustement du prix de vente en fonction du modèle de voiture sélectionné
+            if (name === "voiture_modele") {
+                const match = allVoitures.find(v => `${v.modele} (${v.couleur})` === value);
+                updated.voiture_id = match ? match.id_voiture : null;
+                updated.voiture_couleur = match ? match.couleur : "";
+                updated.prix_vente = match ? match.prix : 0; 
+            }
+
             return updated;
         });
     };
@@ -106,8 +115,15 @@ export function ModifierFacture({ isOpen, onClose, onFactureModified, facture })
                     if (fieldName === 'employe_name') {
                         return { ...prev, employe_name: match.full_name, employe_id: match.id_employe };
                     }
+                    // Ajustement du prix de vente en fonction du modèle de voiture sélectionné
                     if (fieldName === 'voiture_modele') {
-                        return { ...prev, voiture_modele: `${match.modele} (${match.couleur})`, voiture_id: match.id_voiture, voiture_couleur: match.couleur };
+                        return { 
+                            ...prev, 
+                            voiture_modele: `${match.modele} (${match.couleur})`, 
+                            voiture_id: match.id_voiture, 
+                            voiture_couleur: match.couleur,
+                            prix_vente: match.prix || 0
+                        };
                     }
                     return prev;
                 });

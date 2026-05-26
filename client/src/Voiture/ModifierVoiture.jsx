@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-
 import { useContext } from "react";
 import { AuthContext } from "../Securite/authContext";
+// Importation de la fonction pour récupérer la liste de référence des voitures
+import { fetchVoitures } from "../Api/api"; 
 
 export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture }) {
     const { user } = useContext(AuthContext);
@@ -12,16 +13,32 @@ export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture })
         prix: ""
     });
 
+    const [allVoitures, setAllVoitures] = useState([]); // Stocke les voitures pour la vérification
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(""); // Gère l'affichage de l'erreur
 
+    // Charger les données de la voiture et la liste complète à l'ouverture
     useEffect(() => {
-        if (voiture) {
-            setFormData({
-                modele: voiture.modele,
-                couleur: voiture.couleur,
-                stock: voiture.stock,
-                prix: voiture.prix
-            });
+        const loadInitialData = async () => {
+            try {
+                const voitures = await fetchVoitures();
+                setAllVoitures(voitures || []);
+            } catch (error) {
+                console.error("Erreur de chargement des voitures:", error);
+            }
+        };
+
+        if (isOpen) {
+            setErrorMessage(""); // Réinitialise l'erreur à l'ouverture
+            loadInitialData();
+            if (voiture) {
+                setFormData({
+                    modele: voiture.modele,
+                    couleur: voiture.couleur,
+                    stock: voiture.stock,
+                    prix: voiture.prix
+                });
+            }
         }
     }, [voiture, isOpen]);
 
@@ -39,8 +56,21 @@ export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture })
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
+        setErrorMessage(""); // Nettoie l'erreur précédente
 
+        // 1. VERIFICATION LOCALE DU DOUBLON (Modèle + Couleur identiques sur une AUTRE voiture)
+        const isDuplicate = allVoitures.some(v => 
+            v.id_voiture !== voiture.id_voiture && 
+            v.modele.trim().toLowerCase() === formData.modele.trim().toLowerCase() &&
+            v.couleur.trim().toLowerCase() === formData.couleur.trim().toLowerCase()
+        );
+
+        if (isDuplicate) {
+            setErrorMessage("Ce modèle existe déjà avec cette couleur.");
+            return;
+        }
+
+        setIsLoading(true);
         try {
             const res = await fetch(`http://localhost:3000/put/voitures/${voiture.id_voiture}`, {
                 method: "PUT",
@@ -60,9 +90,14 @@ export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture })
                 const data = await res.json();
                 onVoitureModified(data);
                 onClose();
+            } else {
+                // 2. RECUPERATION DU MESSAGE D'ERREUR DU SERVEUR EN CAS D'ECHEC
+                const errorData = await res.json().catch(() => ({}));
+                setErrorMessage(errorData.message || "Ce modèle existe déjà avec cette couleur.");
             }
         } catch (error) {
             console.error("Erreur:", error);
+            setErrorMessage("Une erreur réseau est survenue.");
         } finally {
             setIsLoading(false);
         }
@@ -70,14 +105,12 @@ export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture })
 
     const handleSuppress = async (e) => {
         e.preventDefault();
+        setErrorMessage("");
 
         const isConfirmed = window.confirm("Voulez-vous vraiment supprimer cette voiture ?");
-        if (!isConfirmed) {
-            return;
-        }
+        if (!isConfirmed) return;
 
         setIsLoading(true);
-
         try {
             const res = await fetch(`http://localhost:3000/delete/voiture/${voiture.id_voiture}`, {
                 method: "DELETE",
@@ -165,6 +198,13 @@ export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture })
                                 />
                             </div>
                         </div>
+
+                        {/* EMPLACEMENT DU MESSAGE D'ERREUR SOUS LE PRIX */}
+                        {errorMessage && (
+                            <p className="help is-danger has-text-danger mt-3" style={{ fontSize: "0.95rem", fontWeight: "500" }}>
+                                {errorMessage}
+                            </p>
+                        )}
                     </form>
                 </section>
                 <footer className="modal-card-foot">
@@ -176,14 +216,14 @@ export function ModifierVoiture({ isOpen, onClose, onVoitureModified, voiture })
                     >
                         Modifier
                     </button>
-                    {user.delStock === 1&&(
-                    <button
-                        className={`button is-danger ${isLoading ? 'is-loading' : ''}`}
-                        onClick={handleSuppress}
-                        disabled={isLoading}
-                    >
-                        Supprimer
-                    </button>
+                    {user?.delStock === 1 && (
+                        <button
+                            className={`button is-danger ${isLoading ? 'is-loading' : ''}`}
+                            onClick={handleSuppress}
+                            disabled={isLoading}
+                        >
+                            Supprimer
+                        </button>
                     )}
                 </footer>
             </div>

@@ -246,7 +246,7 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
                                 <datalist id="voitures-list">
                                     {allVoitures.map(v => (
                                         <option key={v.id_voiture} value={`${v.modele} - ${v.couleur}`}>
-                                            Stock: {v.stock} - {v.prix}€
+                                            Stock: {v.stock} - {v.prix}$
                                         </option>
                                     ))}
                                 </datalist>
