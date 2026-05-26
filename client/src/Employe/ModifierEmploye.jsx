@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { InputTelephone } from "../assets/TelepohoneForm";
 export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe }) {
     const [formData, setFormData] = useState({
         full_name: "",
@@ -11,6 +11,9 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
     });
     const [roles, setRoles] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+
+    // L'état pour gérer et afficher les erreurs dans le modal
+    const [erreurSaisie, setErreurSaisie] = useState("");
 
     useEffect(() => {
         if (!isOpen) return;
@@ -36,17 +39,47 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
         getRoles();
     }, [isOpen]);
 
+    // useEffect(() => {
+    //     if (!employe) return;
+    //     setFormData({
+    //         full_name: employe.full_name || "",
+    //         email: employe.email || "",
+    //         password: "",
+    //         phone: employe.phone || "",
+    //         commission: employe.commission || 0,
+    //         role_id: employe.role_id || ""
+    //     });
+    // }, [employe]);
+
     useEffect(() => {
         if (!employe) return;
+
+
+        let rawPhone = employe.phone || "";
+        let formattedPhone = rawPhone;
+
+        if (rawPhone) {
+            const digits = rawPhone.replace(/[^\d]/g, '').slice(0, 10);
+            if (digits.length >= 7) {
+                formattedPhone = `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+            } else if (digits.length >= 4) {
+                formattedPhone = `${digits.slice(0, 3)}-${digits.slice(3)}`;
+            } else {
+                formattedPhone = digits;
+            }
+        }
+
         setFormData({
             full_name: employe.full_name || "",
             email: employe.email || "",
             password: "",
-            phone: employe.phone || "",
+            phone: formattedPhone, // On applique le numéro formaté ici
             commission: employe.commission || 0,
             role_id: employe.role_id || ""
         });
+        setErreurSaisie(""); // Réinitialise l'erreur au changement d'employé
     }, [employe]);
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -59,6 +92,15 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!employe) return;
+
+        //recommence input
+        setErreurSaisie("");
+
+        const regexTelephone = /^\d{3}-\d{3}-\d{4}$/;
+        if (!regexTelephone.test(formData.phone)) {
+            setErreurSaisie("Le numéro de téléphone doit être complet (ex: 514-123-4567).");
+            return;
+        }
 
         setIsLoading(true);
         try {
@@ -89,9 +131,11 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
                 onClose();
             } else {
                 const errorData = await res.json();
+                setErreurSaisie(errorData.message || "Erreur lors de la mise à jour de l'employé.");
                 console.error("Erreur de mise à jour de l'employé :", errorData);
             }
         } catch (error) {
+            setErreurSaisie("Une erreur réseau ou serveur est survenue.");
             console.error("Erreur lors de la mise à jour de l'employé :", error);
         } finally {
             setIsLoading(false);
@@ -103,7 +147,9 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
         const confirmed = window.confirm("Voulez-vous vraiment supprimer cet employé ? Cette action est irréversible.");
         if (!confirmed) return;
 
+
         setIsLoading(true);
+        setErreurSaisie("");
         try {
             const res = await fetch(`http://localhost:3000/employe/${employe.id_employe}`, {
                 method: "DELETE",
@@ -134,9 +180,16 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
             <div className="modal-card">
                 <header className="modal-card-head">
                     <p className="modal-card-title">Modifier l'employé</p>
-                    <button className="delete" onClick={onClose}></button>
+                    {/* <button className="delete" onClick={onClose}></button> */}
+                    <button type="button" className="delete" onClick={onClose}></button>
                 </header>
                 <section className="modal-card-body">
+                    {erreurSaisie && (
+                        <div className="notification is-danger is-light">
+                            <button type="button" className="delete" onClick={() => setErreurSaisie("")}></button>
+                            {erreurSaisie}
+                        </div>
+                    )}
                     <form onSubmit={handleSubmit}>
                         <div className="field">
                             <label className="label">Nom complet</label>
@@ -179,7 +232,7 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
                             </div>
                         </div>
 
-                        <div className="field">
+                        {/* <div className="field">
                             <label className="label">Téléphone</label>
                             <div className="control">
                                 <input
@@ -191,7 +244,15 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
                                     required
                                 />
                             </div>
-                        </div>
+                        </div> */}
+
+                        <InputTelephone
+                            label="Téléphone"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            required={true}
+                        />
 
                         <div className="field">
                             <label className="label">Commission (%)</label>

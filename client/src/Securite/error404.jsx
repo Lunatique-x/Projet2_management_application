@@ -1,31 +1,35 @@
 import { Link, useNavigate } from "react-router-dom";
 
-
 export function Error404() { 
+    const navigate = useNavigate();
+
     return (
-        
-        <div className="section"> 
-        <div><p>4040</p></div>
-            <div className="card-box" style={{ maxWidth: '300px' }}>
-                {/* La grande boîte */}
-                <div className="box" style={{ backgroundColor: '#f5f5f5' }}>
-                    <h3 className="title is-5">Catégories</h3>
+        <div className="section is-medium">
+            <div className="container has-text-centered" style={{ maxWidth: '600px' }}> {/* On garde juste un max-width pour éviter que la boîte soit trop large sur grand écran */}
+                
+                {/* Grand titre d'erreur */}
+                <h1 className="title is-1 has-text-danger mb-2" style={{ fontSize: '6rem' }}>
+                    404
+                </h1>
+                <h2 className="subtitle is-3 has-text-weight-bold">
+                    Page introuvable
+                </h2>
+                
+                <p className="content has-text-grey mb-6">
+                    La page que vous recherchez n'existe pas. 
                     
-                    {/* boîte */}
-                    <div className="box mb-2" style={itemStyle}>Clients</div>
-                    <div className="box mb-2" style={itemStyle}>Voitures</div>
-                    <div className="box mb-2" style={itemStyle}>Factures</div>
-                    <div className="box mb-2" style={itemStyle}>Employés</div>
-                </div>
+                </p>
+
+               
+
+                {/* Bouton de retour */}
+                <button 
+                    onClick={() => navigate(-1)} 
+                    className="button is-text mt-4"
+                >
+                    Retour à la page précédente
+                </button>
             </div>
         </div>
     );
 }
-
-// Style pour que les petites boîtes soient jolies et alignées
-const itemStyle = {
-    padding: '10px',
-    cursor: 'pointer',
-    transition: '0.2s',
-    border: '1px solid #ddd'
-};

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+import { InputTelephone } from "../assets/TelepohoneForm";
+
 export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
     const [formData, setFormData] = useState({
         full_name: "",
@@ -186,7 +188,7 @@ export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
                             </div>
                         </div>
 
-                        <div className="field">
+                        {/* <div className="field">
                             <label className="label">Téléphone</label>
                             <div className="control">
                                 <input
@@ -201,7 +203,14 @@ export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
                                     required
                                 />
                             </div>
-                        </div>
+                        </div> */}
+                          <InputTelephone 
+                            label="Téléphone"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            required={true}
+                        />
 
                         <div className="field">
                             <label className="label">Commission (%)</label>

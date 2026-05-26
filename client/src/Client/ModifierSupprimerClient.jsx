@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useContext } from "react";
 import { AuthContext } from "../Securite/authContext";
 
+import { InputTelephone } from "../assets/TelepohoneForm";
+
 export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
     // Récupération des données utilisateur et de ses permissions (ex: delClients)
     const { user } = useContext(AuthContext);
@@ -18,16 +20,49 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
     const [erreurPdf, setErreurPdf] = useState("");
 
     // Hook synchronisant les champs du formulaire dès que le modal s'ouvre ou change de client
+    // useEffect(() => {
+    //     if (client) {
+    //         setFormData({
+    //             full_name: client.full_name || "", // Sécurité si la valeur est nulle
+    //             email: client.email || "",
+    //             phone: client.phone || ""
+    //         });
+    //         setErreurPdf(""); // Réinitialise l'erreur à l'ouverture
+
+    //         if (client.phone) {
+    //             handleChange({
+    //                 target: { name: "phone", value: client.phone }
+    //             });
+    //         }
+    //     }
+    // }, [client, isOpen]);
+
     useEffect(() => {
-        if (client) {
-            setFormData({
-                full_name: client.full_name || "", // Sécurité si la valeur est nulle
-                email: client.email || "",
-                phone: client.phone || ""
-            });
-            setErreurPdf(""); // Réinitialise l'erreur à l'ouverture
+    if (client) {
+        // Petite logique locale pour forcer le format avec tirets à l'affichage initial
+        let rawPhone = client.phone || "";
+        let formattedPhone = rawPhone;
+        
+        if (rawPhone) {
+            const digits = rawPhone.replace(/[^\d]/g, '').slice(0, 10);
+            if (digits.length >= 7) {
+                formattedPhone = `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+            } else if (digits.length >= 4) {
+                formattedPhone = `${digits.slice(0, 3)}-${digits.slice(3)}`;
+            } else {
+                formattedPhone = digits;
+            }
         }
-    }, [client, isOpen]);
+
+        setFormData({
+            full_name: client.full_name || "", 
+            email: client.email || "",
+            phone: formattedPhone 
+        });
+        
+        setErreurPdf(""); 
+    }
+}, [client, isOpen]);
 
     // Gestionnaire générique des entrées clavier : met à jour l'état au fur et à mesure de la saisie
     const handleChange = (e) => {
@@ -209,7 +244,7 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                             </div>
                         </div>
 
-                        <div className="field">
+                        {/* <div className="field">
                             <label className="label">Téléphone</label>
                             <div className="control">
                                 <input 
@@ -222,7 +257,14 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
                                     required 
                                 />
                             </div>
-                        </div>
+                        </div> */}
+                        <InputTelephone 
+                            label="Téléphone"
+                            name="phone" // Doit correspondre à la clé "phone" de ton formData
+                            value={formData.phone} 
+                            onChange={handleChange} 
+                            required={true}
+                        />
 
                         {/* Bouton de téléchargement du PDF existant */}
                         <div className="field mt-5">

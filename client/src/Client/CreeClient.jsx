@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { InputTelephone } from "../assets/TelepohoneForm";
 
 export function CreeClient({ isOpen, onClose, onClientCreated }) {
     const [formData, setFormData] = useState({
@@ -177,7 +178,7 @@ export function CreeClient({ isOpen, onClose, onClientCreated }) {
                             </div>
                         </div>
 
-                        <div className="field">
+                        {/* <div className="field">
                             <label className="label">Téléphone</label>
                             <div className="control">
                                 <input
@@ -191,7 +192,15 @@ export function CreeClient({ isOpen, onClose, onClientCreated }) {
                                     required
                                 />
                             </div>
-                        </div>
+                        </div> */}
+
+                        <InputTelephone 
+                            label="Téléphone"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            required={true}
+                        />
 
                         <div className="field mt-5">
                             <label className="label">Document PDF associé</label>
