@@ -176,7 +176,12 @@ app.get('/allRole/:id', async (req, res) => {
 app.get('/allEmploye', async (req, res) => {
     console.log("employe");
     try {
-        const result = await db('employe').select('*');
+        const result = await db('employe')
+            .leftJoin('role', 'employe.role_id', '=', 'role.id_role')
+            .select(
+                'employe.*',
+                'role.nom as role_nom'
+            );
         res.json(result);
     } catch (err) {
         res.status(500).json(err);
@@ -189,8 +194,6 @@ app.get('/allEmploye/:id', async (req, res) => {
         const employe = await db('employe')
             .leftJoin('role', 'employe.role_id', '=', 'role.id_role')
             .where('employe.id_employe', employeId)
-            
-            
             .select(
                 'employe.id_employe',
                 'employe.full_name',

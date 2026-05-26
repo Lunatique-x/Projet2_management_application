@@ -29,6 +29,10 @@ export function AfficherEmploye(props) {
                             <span className="has-text-weight-bold">Commission : </span>
                             <span>{employe.commission}%</span>
                         </div>
+                        <div className="mb-0">
+                            <span className="has-text-weight-bold">Rôle : </span>
+                            <span>{employe.role_nom || employe.role_name || employe.role_id || 'Non défini'}</span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -98,6 +98,36 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
         }
     };
 
+    const handleDelete = async () => {
+        if (!employe) return;
+        const confirmed = window.confirm("Voulez-vous vraiment supprimer cet employé ? Cette action est irréversible.");
+        if (!confirmed) return;
+
+        setIsLoading(true);
+        try {
+            const res = await fetch(`http://localhost:3000/employe/${employe.id_employe}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (res.ok) {
+                await res.json();
+                onEmployeModified();
+                onClose();
+            } else {
+                const errorData = await res.json();
+                console.error("Erreur lors de la suppression de l'employé :", errorData);
+            }
+        } catch (error) {
+            console.error("Erreur lors de la suppression de l'employé :", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className={`modal ${isOpen ? 'is-active' : ''}`}>
             <div className="modal-background" onClick={onClose}></div>
@@ -207,6 +237,16 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
                                     disabled={isLoading}
                                 >
                                     {isLoading ? 'Modification en cours...' : 'Modifier'}
+                                </button>
+                            </div>
+                            <div className="control">
+                                <button
+                                    type="button"
+                                    className="button is-danger"
+                                    disabled={isLoading}
+                                    onClick={handleDelete}
+                                >
+                                    {isLoading ? 'Suppression...' : 'Supprimer'}
                                 </button>
                             </div>
                             <div className="control">
