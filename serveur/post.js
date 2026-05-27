@@ -3,28 +3,40 @@ const bcrypt = require('bcrypt')
 const app = express.Router();
 //const  db  = require('./db'); V1
 const { db } = require('./db');//V2
+const { upload } = require('./index.js');
 const port = 3000;
 const authentifier = require('./commun.js')
 
 //route post
 //un nouveau Client
-app.post('/client', async (req, res) => {
+app.post('/client', upload.single('pdf'), async (req, res) => {
     const { full_name, email, phone } = req.body;
+
+    // Récupération du chemin généré par multer (ex: DocumentPDF/171684321-fichier.pdf)
+    const pdf_path = req.file ? req.file.path : null; 
 
     try {
         const clientExistant = await db('client')
             .where({ email })
             .first();
+            
         if (clientExistant) {
             return res.status(400).json({ error: "Un client avec cette adresse email existe déjà." });
         }
 
-        const [id] = await db('client').insert({ full_name, email, phone });
-        res.json({ message: 'Client créé avec succès', id });
+        const [id] = await db('client').insert({ 
+            full_name, 
+            email, 
+            phone, 
+            pdf_path 
+        });
+
+        res.json({ message: 'Client créé avec succès', id, pdf_path });
     } catch (err) {
-        res.status(500).json(err);
+        res.status(500).json({ error: err.message });
     }
 });
+
 //une nouvelle Voiture
 app.post('/voiture', async (req, res) => {
     const { modele, stock, couleur, prix } = req.body;
@@ -63,10 +75,10 @@ app.post('/role', async (req, res) => {
 });
 // Route qui permet de crée un Employe
 app.post("/employe", async (req, res) => {
-    const { full_name, email, password, phone, commission, id_role } = req.body;
+    const { full_name, email, password, phone, commission, role_id } = req.body;// ajout de role.id
 
     if (!req.body) {
-    return res.status(400).json({ message: "Le corps de la requête est vide" });
+        return res.status(400).json({ message: "Le corps de la requête est vide" });
     }
 
     // L'email et le password son obligatoire dans la création du compte
@@ -84,7 +96,7 @@ app.post("/employe", async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Insérer en base
-        await db('employe').insert({ full_name, email, password: hashedPassword, phone, commission, id_role });
+        await db('employe').insert({ full_name, email, password: hashedPassword, phone, commission, role_id });//ajout de role_id
 
         // Réponse
         res.status(201).json({ message: "Compte créé avec succès" });

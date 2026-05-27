@@ -73,42 +73,39 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
         }));
     };
 
-    // Fonction de décodage et téléchargement du document PDF stocké localement
-    const handleDownloadPdf = () => {
+    // Fonction de décodage et téléchargement du document PDF
+    const handleDownloadPdf = async () => {
         setErreurPdf("");
         
-        if (!client?.email) {
-            setErreurPdf("Données du client manquantes.");
-            return;
-        }
-
-        // Récupération de la chaîne Base64 liée à l'identifiant email unique du client
-        const chaineBase64 = localStorage.getItem(`client_pdf_${client.email}`);
-
-        if (!chaineBase64) {
-            setErreurPdf("Aucun document PDF associé trouvé pour ce client.");
+        // Vérification de la présence de l'ID du client (nécessaire pour l'URL de l'API)
+        if (!client?.id_client) {
+            setErreurPdf("Identifiant du client manquant pour récupérer le PDF.");
             return;
         }
 
         try {
-            // Nettoyage de l'en-tête "data:application/pdf;base64," si présent
-            const parties = chaineBase64.split(',');
-            const octetsBruts = atob(parties[1] || parties[0]);
-            let n = octetsBruts.length;
-            const tableauOctets = new Uint8Array(n);
+            const response = await fetch(`http://localhost:3000/client/${client.id_client}/download-pdf`, {
+                method: 'GET',
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                    "Content-Type": "application/json"
+                }
+            });
 
-            // Conversion de la chaîne binaire brute en tableau de nombres 8 bits
-            while (n--) {
-                tableauOctets[n] = octetsBruts.charCodeAt(n);
+            // Gestion des erreurs renvoyées par l'API (ex: 404 introuvable)
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || "Aucun document PDF associé trouvé pour ce client.");
             }
 
-            // Génération d'un objet de fichier Blob typé en PDF
-            const fichierBlob = new Blob([tableauOctets], { type: 'application/pdf' });
+            // Récupération de la réponse sous forme de Blob (données binaires du fichier)
+            const fichierBlob = await response.blob();
             const urlFichier = URL.createObjectURL(fichierBlob);
 
             // Création d'un élément d'ancrage HTML invisible pour déclencher le téléchargement
             const lienTemporaire = document.createElement('a');
             lienTemporaire.href = urlFichier;
+            
             // Formatage du nom de fichier en remplaçant les espaces par des underscores
             lienTemporaire.download = `Document_${(client.full_name || "client").replace(/\s+/g, '_')}.pdf`;
             
@@ -121,7 +118,7 @@ export function ModifierClient({ isOpen, onClose, onClientModified, client }) {
 
         } catch (error) {
             console.error("Erreur de traitement du PDF :", error);
-            setErreurPdf("Impossible de lire le fichier PDF.");
+            setErreurPdf(error.message || "Impossible de récupérer ou de lire le fichier PDF.");
         }
     };
 

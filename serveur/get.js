@@ -2,6 +2,8 @@ const express = require('express');
 const port = 3000;
 //const  db  = require('./db'); V1
 const { db } = require('./db');//V2
+const fs = require('fs');
+const path = require('path');
 const app = express.Router();
 const jwt = require('jsonwebtoken');
 const authentifier = require('./commun')
@@ -71,6 +73,7 @@ app.get('/allClient', async (req, res) => {
         res.status(500).json(err);
     }
 });
+
 //cette route permet recuperer un client specifique selon id du client
 app.get('/allClient/:id', async (req, res) => {
     const ClientId  = req.params.id;
@@ -79,10 +82,12 @@ app.get('/allClient/:id', async (req, res) => {
             .where('id_client', ClientId)
             .select(
                 'id_client',
-                 'full_name', 
-                 'email', 'phone',
-                  'date_creation'
-                )
+                'full_name', 
+                'email',
+                'phone',
+                'pdf_path',
+                'date_creation'
+            )
             .first(); 
         if (!client) {
             return res.status(404).json({ message: "Client non trouvé." });
@@ -95,6 +100,46 @@ app.get('/allClient/:id', async (req, res) => {
     }
 });
 
+// Route pour télécharger le PDF d'un client spécifique
+app.get('/client/:id/download-pdf', async (req, res) => {
+    const clientId = req.params.id;
+
+    try {
+        // Chercher le chemin du PDF en base de données
+        const client = await db('client')
+            .where('id_client', clientId)
+            .select('pdf_path', 'full_name')
+            .first();
+
+        // Vérifier si le client existe
+        if (!client) {
+            return res.status(404).json({ message: "Client non trouvé." });
+        }
+
+        // Vérifier si ce client possède un PDF
+        if (!client.pdf_path) {
+            return res.status(404).json({ message: "Ce client n'a pas de fichier PDF associé." });
+        }
+
+        // Construire le chemin absolu du fichier sur le serveur
+        const absolutePath = path.resolve(client.pdf_path);
+
+        // Vérifier si le fichier existe physiquement sur le disque
+        if (!fs.existsSync(absolutePath)) {
+            return res.status(404).json({ message: "Le fichier PDF est introuvable sur le serveur." });
+        }
+
+        // Optionnel : Nettoyer le nom du client pour le fichier téléchargé
+        const safeFileName = `${client.full_name.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+
+        // Déclencher le téléchargement chez l'utilisateur
+        res.download(absolutePath, safeFileName);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur lors du téléchargement du PDF." });
+    }
+});
 
 // Cette route permet de recuperer tout les voitures
 app.get('/allVoiture', async (req, res) => {

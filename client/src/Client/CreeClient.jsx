@@ -96,24 +96,36 @@ export function CreeClient({ isOpen, onClose, onClientCreated }) {
         setIsLoading(true);
 
         try {
+            // 1. On crée une instance de FormData au lieu d'un objet JSON
+            const donneesFormulaire = new FormData();
+            
+            // 2. On ajoute les champs textes
+            donneesFormulaire.append("full_name", formData.full_name);
+            donneesFormulaire.append("email", formData.email);
+            donneesFormulaire.append("phone", formData.phone);
+            
+            // 3. On ajoute le fichier PDF SEULEMENT s'il existe (puisqu'il est optionnel)
             if (fichier) {
-                const chaineBase64 = await convertirEnBase64(fichier);
-                localStorage.setItem(`client_pdf_${formData.email}`, chaineBase64);
+                // Le premier paramètre 'pdf' doit être EXACTEMENT le même nom que dans upload.single('pdf') côté serveur
+                donneesFormulaire.append("pdf", fichier); 
             }
 
+            // 4. Envoi de la requête HTTP
             const res = await fetch("http://localhost:3000/post/client", {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${localStorage.getItem('token')}`,
-                    "Content-Type": "application/json"
+                    // IMPORTANT : On retire "Content-Type": "application/json"
+                    // Le navigateur va configurer automatiquement le bon Content-Type (multipart/form-data)
+                    "Authorization": `Bearer ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify(formData)
+                body: donneesFormulaire // On passe l'objet FormData ici
             });
 
             if (res.ok) {
                 const data = await res.json();
                 onClientCreated(data);
                 
+                // Réinitialisation des états
                 setFormData({
                     full_name: "",
                     email: "",
@@ -122,7 +134,8 @@ export function CreeClient({ isOpen, onClose, onClientCreated }) {
                 setFichier(null);
                 onClose();
             } else {
-                setErreurFichier("Erreur serveur lors de la création du client.");
+                const errorData = await res.json().catch(() => ({}));
+                setErreurFichier(errorData.error || "Erreur serveur lors de la création du client.");
             }
 
         } catch (error) {
@@ -132,6 +145,7 @@ export function CreeClient({ isOpen, onClose, onClientCreated }) {
             setIsLoading(false);
         }
     };
+
 
     return (
         <div className={`modal ${isOpen ? 'is-active' : ''}`}>
