@@ -120,6 +120,22 @@ paths:
         '200':
           description: Succès
 
+  /client/{id}/download-pdf:
+    get:
+      tags:
+        - Client
+      summary: Récupération du pdf d'un client
+      Description: Cette permet de récupérer un document pdf associe a un client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Succès
+
   /post/client:
     post:
       tags:
