@@ -251,7 +251,7 @@ export function CreeFacture({ isOpen, onClose, onFactureCreated }) {
                                     ))}
                                 </datalist>
                                 {formData.voiture_couleur && (
-                                    <p className="help is-success">Couleur: {formData.voiture_couleur} | Prix: {formData.prix_vente}€</p>
+                                    <p className="help is-success">Couleur: {formData.voiture_couleur} | Prix: {formData.prix_vente}$</p>
                                 )}
                             </div>
                         </div>
