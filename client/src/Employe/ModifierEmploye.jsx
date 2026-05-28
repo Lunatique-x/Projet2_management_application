@@ -166,7 +166,7 @@ export function ModifierEmploye({ isOpen, onClose, onEmployeModified, employe })
         setIsLoading(true);
         setErreurSaisie("");
         try {
-            const res = await fetch(`http://localhost:3000/employe/${employe.id_employe}`, {
+            const res = await fetch(`http://localhost:3000/delete/employe/${employe.id_employe}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`,

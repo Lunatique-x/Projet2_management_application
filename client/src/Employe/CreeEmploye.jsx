@@ -92,7 +92,7 @@ export function CreeEmploye({ isOpen, onClose, onEmployeCreated }) {
         setIsLoading(true);
 
         try {
-            const res = await fetch("http://localhost:3000/auth/register", {
+            const res = await fetch("http://localhost:3000/post/employe", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`,

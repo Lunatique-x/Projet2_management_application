@@ -130,6 +130,7 @@ if (!existsRole) {
       table.string("full_name").notNullable();
       table.string("email").notNullable();
       table.string("phone").notNullable();
+      table.string("pdf_path");
       table.timestamp("date_creation").defaultTo(db.fn.now());
     });
   }

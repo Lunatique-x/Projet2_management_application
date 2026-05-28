@@ -3,6 +3,7 @@ const cors = require('cors');;
 const app = express(); // Ici on crée l'application principale
 const port = 3000;
 const path = require('path')
+const multer = require('multer');
 //const routesGet = require('./get.js'); // Importation des routes gets
 //const routeAuth = require('./authentification.js') // Importation des routes authentifications
 //const routePost = require('./post.js') // Importation des routes posts
@@ -11,6 +12,26 @@ const path = require('path')
 //const authentifier = require('./commun.js');
 const { initializeDatabase } = require('./db');
 
+// Configuration du stockage de Multer
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'DocumentPDF/'); // Les fichiers iront dans ce dossier
+    },
+    filename: (req, file, cb) => {
+        // Génère un nom unique pour éviter les doublons (Ex: 171684321-rapport.pdf)
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+// Filtrer pour n'accepter que les PDF
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+        cb(null, true);
+    } else {
+        cb(new Error('Seuls les fichiers PDF sont autorisés !'), false);
+    }
+};
+const upload = multer({ storage: storage, fileFilter: fileFilter });
 // Optionnel mais recommandé pour lire le JSON plus tard
 app.use(express.json());
 app.use(cors());
@@ -66,3 +87,5 @@ initializeDatabase()
     console.error(' Erreur critique :', error);
     process.exit(1);
   });
+
+module.exports = { upload };
