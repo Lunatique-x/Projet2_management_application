@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../Securite/authContext";
-import { useContext } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
+import { fetchClients, fetchVoitures } from "../Api/api";
 import voitureHome from "../assets/voiturehome.png";
 
 
@@ -9,6 +10,41 @@ export function Home() {
     //useContexte
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    const [voitureCount, setVoitureCount] = useState(0);
+    const [modeleCount, setModeleCount] = useState(0);
+    const [clientCount, setClientCount] = useState(0);
+    const [isLoadingCounts, setIsLoadingCounts] = useState(true);
+
+    const loadStats = useCallback(async () => {
+        setIsLoadingCounts(true);
+        const [voitures, clients] = await Promise.all([fetchVoitures(), fetchClients()]);
+        const totalStock = voitures.reduce((sum, voiture) => sum + (Number(voiture.stock) || 0), 0);
+        const uniqueModels = new Set(
+            voitures
+                .map((voiture) => voiture.modele?.trim().toLowerCase())
+                .filter(Boolean)
+        );
+
+        setVoitureCount(totalStock);
+        setModeleCount(uniqueModels.size);
+        setClientCount(clients.length);
+        setIsLoadingCounts(false);
+    }, []);
+
+    useEffect(() => {
+        loadStats();
+
+        const handleWindowFocus = () => {
+            loadStats();
+        };
+
+        window.addEventListener("focus", handleWindowFocus);
+
+        return () => {
+            window.removeEventListener("focus", handleWindowFocus);
+        };
+    }, [loadStats]);
 
     const handleAuthClick = () => {
         if (user) {
@@ -44,6 +80,27 @@ export function Home() {
                     <p className="home-hero__subtitle">
                         Une interface claire pour gérer vos clients, vos voitures et vos factures dans un seul espace.
                     </p>
+
+                    <div className="home-hero__stats">
+                        <div className="home-stat-card">
+                            <span className="home-stat-label">Voitures en stock</span>
+                            <strong className="home-stat-value">
+                                {isLoadingCounts ? "..." : voitureCount}
+                            </strong>
+                        </div>
+                        <div className="home-stat-card">
+                            <span className="home-stat-label">Modèles disponibles</span>
+                            <strong className="home-stat-value">
+                                {isLoadingCounts ? "..." : modeleCount}
+                            </strong>
+                        </div>
+                        <div className="home-stat-card">
+                            <span className="home-stat-label">Clients</span>
+                            <strong className="home-stat-value">
+                                {isLoadingCounts ? "..." : clientCount}
+                            </strong>
+                        </div>
+                    </div>
 
                     <div className="home-hero__actions">
                         {user && user.viewStock === 1 && (
