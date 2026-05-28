@@ -38,7 +38,7 @@ app.put('/payements/:id', async (req, res) => {
     // Utilisation d'une transaction Knex pour sécuriser les modifications d'un coup
     await db.transaction(async (trx) => {
       
-      // 1. Récupérer l'ancien paiement pour connaître l'ancienne voiture
+      // Récupérer l'ancien paiement pour connaître l'ancienne voiture
       const ancienPayement = await trx('payement')
         .where({ id_payement: id })
         .first();
@@ -50,7 +50,7 @@ app.put('/payements/:id', async (req, res) => {
       const ancienneVoitureId = ancienPayement.voiture_id;
       const nouvelleVoitureId = Number(voiture_id);
 
-      // 2. Si la voiture a changé, on réajuste les stocks
+      // Si la voiture a changé, on réajuste les stocks
       if (ancienneVoitureId !== nouvelleVoitureId) {
         
         // Rendre le stock à l'ancienne voiture
@@ -73,7 +73,7 @@ app.put('/payements/:id', async (req, res) => {
           .decrement('stock', 1);
       }
 
-      // 3. Mettre à jour la facture de paiement
+      // Mettre à jour la facture de paiement
       await trx('payement')
         .where({ id_payement: id })
         .update({
@@ -83,7 +83,7 @@ app.put('/payements/:id', async (req, res) => {
           prix_vente
         });
 
-      // 4. Récupérer la ligne mise à jour pour la renvoyer
+      // Récupérer la ligne mise à jour pour la renvoyer
       const payementMisAJour = await trx('payement')
         .where({ id_payement: id })
         .first();

@@ -306,28 +306,86 @@ paths:
       tags:
         - Facture
       summary: Modifications Facture
+      description: Met à jour une facture de paiement. Gère l'historique et ajuste automatiquement les stocks de voitures si le véhicule change.
       parameters:
         - name: id
           in: path
           required: true
+          description: L'identifiant unique du paiement à modifier
           schema:
-            type: string
-          example: "1"
+            type: integer
+          example: 1
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - client_id
+                - employe_id
+                - voiture_id
+                - prix_vente
               properties:
+                client_id:
+                  type: integer
+                  description: ID du client associé
+                  example: 12
+                employe_id:
+                  type: integer
+                  description: ID de l'employé qui réalise la vente
+                  example: 4
+                voiture_id:
+                  type: integer
+                  description: ID du nouveau véhicule choisi
+                  example: 85
                 prix_vente:
                   type: number
+                  format: float
+                  description: Le montant de la transaction
                   example: 3000
       responses:
         '200':
-          description: Facture modifiée
+          description: Facture modifiée avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id_payement:
+                    type: integer
+                  client_id:
+                    type: integer
+                  employe_id:
+                    type: integer
+                  voiture_id:
+                    type: integer
+                  prix_vente:
+                    type: number
+        '400':
+          description: Rupture de stock pour la nouvelle voiture
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "La nouvelle voiture sélectionnée est en rupture de stock."
+        '404':
+          description: Paiement introuvable en base de données
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Paiement introuvable"
+        '500':
+          description: Erreur interne du serveur
 
-  /delete/payment/{id}:
+  /delete/payement/{id}:
     delete:
       tags:
         - Facture
@@ -450,39 +508,87 @@ paths:
     post:
       tags:
         - Role
-      summary: Création rôle
-      description: Création d'un role
+      summary: Création d'un rôle
+      description: Crée un nouveau rôle utilisateur avec des permissions d'accès spécifiques pour les stocks, les clients et les ventes.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - nom
               properties:
                 nom:
                   type: string
+                  description: Le nom unique du rôle
                   example: "Vendeur Junior"
-                seeStock:
+                viewStock:
                   type: boolean
+                  default: false
                   example: true
                 modStock:
                   type: boolean
+                  default: false
                   example: false
-                seeClients:
+                viewClients:
                   type: boolean
+                  default: false
                   example: true
+                delClients:
+                  type: boolean
+                  default: false
+                  example: false
                 modClients:
                   type: boolean
+                  default: false
+                  example: false
+                viewSell:
+                  type: boolean
+                  default: false
+                  example: true
+                delSell:
+                  type: boolean
+                  default: false
                   example: false
                 modSell:
                   type: boolean
+                  default: false
+                  example: true
+                addSell:
+                  type: boolean
+                  default: false
                   example: true
                 addClient:
                   type: boolean
+                  default: false
                   example: true
+                addStock:
+                  type: boolean
+                  default: false
+                  example: false
+                delStock:
+                  type: boolean
+                  default: false
+                  example: false
       responses:
         '201':
           description: Rôle créé avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id_role:
+                    type: integer
+                    example: 1
+                  nom:
+                    type: string
+                    example: "Vendeur Junior"
+        '400':
+          description: Requête invalide (par exemple, le nom du rôle est manquant)
+        '500':
+          description: Erreur interne du serveur
 
   /allRole:
     get:
@@ -515,15 +621,16 @@ paths:
     put:
       tags:
         - Role
-      summary: Modification Role
-      description: Modifie un role
+      summary: Modification d'un rôle
+      description: Permet de modifier partiellement ou totalement les informations et les permissions d'un rôle existant via son identifiant unique.
       parameters:
         - name: id
           in: path
           required: true
+          description: L'identifiant unique du rôle à modifier
           schema:
-            type: string
-          example: "1"
+            type: integer
+          example: 1
       requestBody:
         required: true
         content:
@@ -533,16 +640,84 @@ paths:
               properties:
                 nom:
                   type: string
-                  example: "Vendeur Junior"
-                seeStock:
+                  description: Le nouveau nom du rôle
+                  example: "Vendeur Senior"
+                viewStock:
                   type: boolean
+                  description: Autoriser la visualisation du stock
+                  example: true
+                modStock:
+                  type: boolean
+                  description: Autoriser la modification du stock
+                  example: true
+                viewClients:
+                  type: boolean
+                  description: Autoriser la visualisation des clients
+                  example: true
+                delClients:
+                  type: boolean
+                  description: Autoriser la suppression des clients
                   example: false
                 modClients:
                   type: boolean
+                  description: Autoriser la modification des clients
                   example: true
+                viewSell:
+                  type: boolean
+                  description: Autoriser la visualisation des ventes
+                  example: true
+                delSell:
+                  type: boolean
+                  description: Autoriser la suppression des ventes
+                  example: false
+                modSell:
+                  type: boolean
+                  description: Autoriser la modification des ventes
+                  example: true
+                addSell:
+                  type: boolean
+                  description: Autoriser l'ajout de ventes
+                  example: true
+                addClient:
+                  type: boolean
+                  description: Autoriser l'ajout de clients
+                  example: true
+                addStock:
+                  type: boolean
+                  description: Autoriser l'ajout de produits au stock
+                  example: true
+                delStock:
+                  type: boolean
+                  description: Autoriser la suppression d'éléments du stock
+                  example: false
       responses:
         '200':
           description: Rôle modifié avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id_role:
+                    type: integer
+                    example: 1
+                  nom:
+                    type: string
+                    example: "Vendeur Senior"
+        '400':
+          description: Données fournies invalides ou mal formées
+        '404':
+          description: Rôle introuvable avec l'identifiant fourni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Rôle introuvable"
+        '500':
+          description: Erreur interne du serveur
 
   /delete/role/{id}:
     delete:
