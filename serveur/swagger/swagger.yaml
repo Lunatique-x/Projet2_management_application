@@ -330,20 +330,20 @@ paths:
                 client_id:
                   type: integer
                   description: ID du client associé
-                  example: 12
+                  example: 6
                 employe_id:
                   type: integer
                   description: ID de l'employé qui réalise la vente
-                  example: 4
+                  example: 2
                 voiture_id:
                   type: integer
                   description: ID du nouveau véhicule choisi
-                  example: 85
+                  example: 4
                 prix_vente:
                   type: number
                   format: float
                   description: Le montant de la transaction
-                  example: 3000
+                  example: 30000
       responses:
         '200':
           description: Facture modifiée avec succès
